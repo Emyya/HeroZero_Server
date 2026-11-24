@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+use HeroZero\GameTime;
+
 use HeroZero\Db;
 use HeroZero\GameError;
 use HeroZero\Live;
@@ -20,9 +22,11 @@ return function (array $params): array {
         throw new GameError('errRequestInvalidParameter');
     }
     [$isPremium, $cost] = $costEntry;
-    // -1 = permanente: expiracao no futuro distante.
-    $expires = $duration === -1 ? time() + 1576800000 : time() + $duration;
-
+    // ACUMULA a duracao (1:1 com o buyBooster.req.php oficial): a base e a
+    // expiracao ATIVA atual, nao "agora". Antes era GameTime::now()+duration e extender
+    // um booster com tempo restante PERDIA esse tempo -- ex.: 90 dias restantes
+    // + extensao de 30 ficava em 30 ("a data nao muda"), enquanto em quem tinha
+    // so ~7 dias restantes parecia funcionar por coincidencia.
     if ($userId > 0) {
         $char = \HeroZero\Character::loadByUser($userId);
         if ($boosterType === 0) {
@@ -41,6 +45,9 @@ return function (array $params): array {
             4 => ['active_league_booster_id', 'ts_active_league_boost_expires'],
             default => ['active_stats_booster_id', 'ts_active_stats_boost_expires'],
         };
+        $base = max(GameTime::now(), (int)Db::value("SELECT `{$field[1]}` FROM `character` WHERE id = ?", [$char->id()]));
+        // -1 = permanente: expiracao no futuro distante.
+        $expires = $base + ($duration === -1 ? 1576800000 : $duration);
         // Debita ANTES de ativar (atomico via condicao no UPDATE). Boosters baratos
         // custam moeda comum do personagem; os fortes custam donuts do user.
         if ($isPremium) {

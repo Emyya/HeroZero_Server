@@ -1,0 +1,1093 @@
+{
+    "_source": "assets/data/constants_json.data (CDN, zlib) \u2014 extraido em 2026-08-22",
+    "_note": "Catalogo OFICIAL constants.npcs. type: 1=quest, 2=?, 3=dungeon, 5=story_dungeon, 6=boss. Sem stats por NPC (v\u00eam do balancing).",
+    "_counts": {
+        "type_1": 107,
+        "type_2": 38,
+        "type_3": 90,
+        "type_5": 14,
+        "type_6": 21
+    },
+    "npcs": {
+        "npc_business_man_artless": {
+            "voice": 1,
+            "type": 1
+        },
+        "npc_business_man_respectable": {
+            "voice": 1,
+            "type": 1
+        },
+        "npc_business_man_threatening": {
+            "voice": 1,
+            "type": 1
+        },
+        "npc_hoody_evil": {
+            "voice": 1,
+            "type": 1
+        },
+        "npc_hoody_very_evil": {
+            "voice": 1,
+            "type": 1
+        },
+        "npc_hoody_scruffy": {
+            "voice": 1,
+            "type": 1
+        },
+        "npc_kids_one_evil": {
+            "voice": 3,
+            "type": 1
+        },
+        "npc_kids_two_evil": {
+            "voice": 3,
+            "type": 1
+        },
+        "npc_kids_two_laughing": {
+            "voice": 3,
+            "type": 1
+        },
+        "npc_tourist": {
+            "voice": 1,
+            "type": 1
+        },
+        "npc_animator": {
+            "voice": 1,
+            "type": 1
+        },
+        "npc_adventurer": {
+            "voice": 1,
+            "type": 1
+        },
+        "npc_tourists": {
+            "voice": 1,
+            "type": 1
+        },
+        "npc_cook": {
+            "voice": 1,
+            "type": 1
+        },
+        "npc_concierge": {
+            "voice": 1,
+            "type": 1
+        },
+        "npc_joker": {
+            "voice": 1,
+            "type": 2
+        },
+        "npc_c3_d2": {
+            "voice": 1,
+            "type": 2
+        },
+        "npc_sergant": {
+            "voice": 1,
+            "type": 2
+        },
+        "npc_revenger": {
+            "voice": 1,
+            "type": 2
+        },
+        "npc_mad_scientist": {
+            "voice": 1,
+            "type": 2
+        },
+        "npc_dark_father": {
+            "voice": 1,
+            "type": 2
+        },
+        "npc_prof_evil": {
+            "voice": 1,
+            "type": 2
+        },
+        "npc_mafioso_godfather": {
+            "voice": 1,
+            "type": 2
+        },
+        "npc_cheater": {
+            "voice": 1,
+            "type": 1
+        },
+        "npc_loser": {
+            "voice": 1,
+            "type": 1
+        },
+        "npc_mastermind": {
+            "voice": 1,
+            "type": 1
+        },
+        "npc_magicians": {
+            "voice": 1,
+            "type": 1
+        },
+        "npc_elvis": {
+            "voice": 1,
+            "type": 1
+        },
+        "npc_dungeon1_npc1": {
+            "voice": 1,
+            "type": 3
+        },
+        "npc_dungeon1_npc2": {
+            "voice": 1,
+            "type": 3
+        },
+        "npc_dungeon1_npc3": {
+            "voice": 1,
+            "type": 3
+        },
+        "npc_dungeon1_npc4": {
+            "voice": 1,
+            "type": 3
+        },
+        "npc_dungeon1_npc5": {
+            "voice": 1,
+            "type": 3
+        },
+        "npc_dungeon1_npc6": {
+            "voice": 1,
+            "type": 3
+        },
+        "npc_dungeon1_npc7": {
+            "voice": 1,
+            "type": 3
+        },
+        "npc_dungeon1_npc8": {
+            "voice": 1,
+            "type": 3
+        },
+        "npc_dungeon1_npc9": {
+            "voice": 1,
+            "type": 3
+        },
+        "npc_dungeon1_npc10": {
+            "voice": 1,
+            "type": 3
+        },
+        "npc_dungeon2_npc1": {
+            "voice": 1,
+            "type": 3
+        },
+        "npc_dungeon2_npc2": {
+            "voice": 1,
+            "type": 3
+        },
+        "npc_dungeon2_npc3": {
+            "voice": 1,
+            "type": 3
+        },
+        "npc_dungeon2_npc4": {
+            "voice": 1,
+            "type": 3
+        },
+        "npc_dungeon2_npc5": {
+            "voice": 1,
+            "type": 3
+        },
+        "npc_dungeon2_npc6": {
+            "voice": 1,
+            "type": 3
+        },
+        "npc_dungeon2_npc7": {
+            "voice": 1,
+            "type": 3
+        },
+        "npc_dungeon2_npc8": {
+            "voice": 1,
+            "type": 3
+        },
+        "npc_dungeon2_npc9": {
+            "voice": 1,
+            "type": 3
+        },
+        "npc_dungeon2_npc10": {
+            "voice": 1,
+            "type": 3
+        },
+        "npc_dungeon3_npc1": {
+            "voice": 1,
+            "type": 3
+        },
+        "npc_dungeon3_npc2": {
+            "voice": 1,
+            "type": 3
+        },
+        "npc_dungeon3_npc3": {
+            "voice": 1,
+            "type": 3
+        },
+        "npc_dungeon3_npc4": {
+            "voice": 1,
+            "type": 3
+        },
+        "npc_dungeon3_npc5": {
+            "voice": 1,
+            "type": 3
+        },
+        "npc_dungeon3_npc6": {
+            "voice": 1,
+            "type": 3
+        },
+        "npc_dungeon3_npc7": {
+            "voice": 1,
+            "type": 3
+        },
+        "npc_dungeon3_npc8": {
+            "voice": 1,
+            "type": 3
+        },
+        "npc_dungeon3_npc9": {
+            "voice": 1,
+            "type": 3
+        },
+        "npc_dungeon3_npc10": {
+            "voice": 1,
+            "type": 3
+        },
+        "npc_dungeon4_npc1": {
+            "voice": 1,
+            "type": 3
+        },
+        "npc_dungeon4_npc2": {
+            "voice": 1,
+            "type": 3
+        },
+        "npc_dungeon4_npc3": {
+            "voice": 1,
+            "type": 3
+        },
+        "npc_dungeon4_npc4": {
+            "voice": 1,
+            "type": 3
+        },
+        "npc_dungeon4_npc5": {
+            "voice": 1,
+            "type": 3
+        },
+        "npc_dungeon4_npc6": {
+            "voice": 1,
+            "type": 3
+        },
+        "npc_dungeon4_npc7": {
+            "voice": 1,
+            "type": 3
+        },
+        "npc_dungeon4_npc8": {
+            "voice": 1,
+            "type": 3
+        },
+        "npc_dungeon4_npc9": {
+            "voice": 1,
+            "type": 3
+        },
+        "npc_dungeon4_npc10": {
+            "voice": 1,
+            "type": 3
+        },
+        "npc_olympia_robot_small": {
+            "voice": 1,
+            "type": 1
+        },
+        "npc_olympia_winner": {
+            "voice": 1,
+            "type": 1
+        },
+        "npc_olympia_hippies": {
+            "voice": 3,
+            "type": 1
+        },
+        "npc_olympia_crusher": {
+            "voice": 1,
+            "type": 1
+        },
+        "npc_olympia_fencer": {
+            "voice": 1,
+            "type": 1
+        },
+        "npc_olympia_worldboss": {
+            "voice": 1,
+            "type": 2
+        },
+        "npc_dungeon5_npc1": {
+            "voice": 1,
+            "type": 3
+        },
+        "npc_dungeon5_npc2": {
+            "voice": 1,
+            "type": 3
+        },
+        "npc_dungeon5_npc3": {
+            "voice": 1,
+            "type": 3
+        },
+        "npc_dungeon5_npc4": {
+            "voice": 1,
+            "type": 3
+        },
+        "npc_dungeon5_npc5": {
+            "voice": 1,
+            "type": 3
+        },
+        "npc_dungeon5_npc6": {
+            "voice": 1,
+            "type": 3
+        },
+        "npc_dungeon5_npc7": {
+            "voice": 1,
+            "type": 3
+        },
+        "npc_dungeon5_npc8": {
+            "voice": 1,
+            "type": 3
+        },
+        "npc_dungeon5_npc9": {
+            "voice": 1,
+            "type": 3
+        },
+        "npc_dungeon5_npc10": {
+            "voice": 1,
+            "type": 3
+        },
+        "npc_sillycon_valley_boss": {
+            "voice": 1,
+            "type": 1
+        },
+        "npc_sillycon_valley_nerd": {
+            "voice": 1,
+            "type": 1
+        },
+        "npc_sillycon_valley_killer_segway": {
+            "voice": 1,
+            "type": 1
+        },
+        "npc_sillycon_valley_stressed_manager": {
+            "voice": 1,
+            "type": 1
+        },
+        "npc_mario": {
+            "voice": 1,
+            "type": 2
+        },
+        "npc_zombie": {
+            "voice": 1,
+            "type": 2
+        },
+        "npc_halloween_ghost": {
+            "voice": 1,
+            "type": 1
+        },
+        "npc_paris_couple": {
+            "voice": 1,
+            "type": 1
+        },
+        "npc_paris_gredin": {
+            "voice": 1,
+            "type": 1
+        },
+        "npc_paris_frenchman": {
+            "voice": 1,
+            "type": 1
+        },
+        "npc_paris_thief": {
+            "voice": 1,
+            "type": 1
+        },
+        "npc_grinch": {
+            "voice": 1,
+            "type": 2
+        },
+        "npc_easterthief": {
+            "voice": 1,
+            "type": 2
+        },
+        "npc_artist": {
+            "voice": 1,
+            "type": 2
+        },
+        "npc_thief": {
+            "voice": 1,
+            "type": 1
+        },
+        "npc_casualguy": {
+            "voice": 1,
+            "type": 1
+        },
+        "npc_business_man_cool": {
+            "voice": 1,
+            "type": 1
+        },
+        "npc_westler": {
+            "voice": 1,
+            "type": 1
+        },
+        "npc_moviestar": {
+            "voice": 1,
+            "type": 1
+        },
+        "npc_dirty_slob": {
+            "voice": 1,
+            "type": 2
+        },
+        "npc_telekom": {
+            "voice": 1,
+            "type": 2
+        },
+        "npc_dungeon6_npc1": {
+            "voice": 1,
+            "type": 3
+        },
+        "npc_dungeon6_npc2": {
+            "voice": 1,
+            "type": 3
+        },
+        "npc_dungeon6_npc3": {
+            "voice": 1,
+            "type": 3
+        },
+        "npc_dungeon6_npc4": {
+            "voice": 2,
+            "type": 3
+        },
+        "npc_dungeon6_npc5": {
+            "voice": 1,
+            "type": 3
+        },
+        "npc_dungeon6_npc6": {
+            "voice": 1,
+            "type": 3
+        },
+        "npc_dungeon6_npc7": {
+            "voice": 1,
+            "type": 3
+        },
+        "npc_dungeon6_npc8": {
+            "voice": 1,
+            "type": 3
+        },
+        "npc_dungeon6_npc9": {
+            "voice": 1,
+            "type": 3
+        },
+        "npc_dungeon6_npc10": {
+            "voice": 1,
+            "type": 3
+        },
+        "npc_fonic": {
+            "voice": 1,
+            "type": 2
+        },
+        "npc_winterolympics_yeti": {
+            "voice": 1,
+            "type": 1
+        },
+        "npc_winterolympics_iceman": {
+            "voice": 1,
+            "type": 1
+        },
+        "npc_winterolympics_coach": {
+            "voice": 1,
+            "type": 1
+        },
+        "npc_winterolympics_littlerascal": {
+            "voice": 1,
+            "type": 1
+        },
+        "npc_winterolympics_protestors": {
+            "voice": 1,
+            "type": 1
+        },
+        "npc_marshmellow_man": {
+            "voice": 1,
+            "type": 2
+        },
+        "npc_kangaroo": {
+            "voice": 1,
+            "type": 1
+        },
+        "npc_yoyosurfer": {
+            "voice": 1,
+            "type": 1
+        },
+        "npc_sunnyboy": {
+            "voice": 1,
+            "type": 1
+        },
+        "npc_dungeon7_npc1": {
+            "voice": 2,
+            "type": 3
+        },
+        "npc_dungeon7_npc2": {
+            "voice": 1,
+            "type": 3
+        },
+        "npc_dungeon7_npc3": {
+            "voice": 1,
+            "type": 3
+        },
+        "npc_dungeon7_npc4": {
+            "voice": 1,
+            "type": 3
+        },
+        "npc_dungeon7_npc5": {
+            "voice": 1,
+            "type": 3
+        },
+        "npc_dungeon7_npc6": {
+            "voice": 1,
+            "type": 3
+        },
+        "npc_dungeon7_npc7": {
+            "voice": 1,
+            "type": 3
+        },
+        "npc_dungeon7_npc8": {
+            "voice": 1,
+            "type": 3
+        },
+        "npc_dungeon7_npc9": {
+            "voice": 1,
+            "type": 3
+        },
+        "npc_dungeon7_npc10": {
+            "voice": 1,
+            "type": 3
+        },
+        "npc_worldcup_hotdog_vendor": {
+            "voice": 1,
+            "type": 1
+        },
+        "npc_worldcup_shirt_thief": {
+            "voice": 1,
+            "type": 1
+        },
+        "npc_worldcup_fan": {
+            "voice": 1,
+            "type": 1
+        },
+        "npc_worldcup_security": {
+            "voice": 1,
+            "type": 1
+        },
+        "npc_worldcup_killjoy": {
+            "voice": 1,
+            "type": 2
+        },
+        "npc_ball_stabber": {
+            "voice": 1,
+            "type": 1
+        },
+        "npc_poacher": {
+            "voice": 1,
+            "type": 2
+        },
+        "npc_false_mayor": {
+            "voice": 1,
+            "type": 1
+        },
+        "npc_disturbing_neighbor": {
+            "voice": 1,
+            "type": 1
+        },
+        "npc_nastier_employee": {
+            "voice": 1,
+            "type": 1
+        },
+        "npc_bad_artist": {
+            "voice": 1,
+            "type": 1
+        },
+        "npc_vegetable_thief": {
+            "voice": 1,
+            "type": 1
+        },
+        "npc_doglady": {
+            "voice": 2,
+            "type": 1
+        },
+        "npc_violator": {
+            "voice": 1,
+            "type": 1
+        },
+        "npc_flyer_distributor": {
+            "voice": 1,
+            "type": 1
+        },
+        "npc_cheese_technic": {
+            "voice": 1,
+            "type": 1
+        },
+        "npc_dubious_trader": {
+            "voice": 1,
+            "type": 1
+        },
+        "npc_hercules_hydra": {
+            "voice": 1,
+            "type": 2
+        },
+        "npc_dungeon8_npc1": {
+            "voice": 1,
+            "type": 3
+        },
+        "npc_dungeon8_npc2": {
+            "voice": 1,
+            "type": 3
+        },
+        "npc_dungeon8_npc3": {
+            "voice": 1,
+            "type": 3
+        },
+        "npc_dungeon8_npc4": {
+            "voice": 1,
+            "type": 3
+        },
+        "npc_dungeon8_npc5": {
+            "voice": 1,
+            "type": 3
+        },
+        "npc_dungeon8_npc6": {
+            "voice": 1,
+            "type": 3
+        },
+        "npc_dungeon8_npc7": {
+            "voice": 1,
+            "type": 3
+        },
+        "npc_dungeon8_npc8": {
+            "voice": 1,
+            "type": 3
+        },
+        "npc_dungeon8_npc9": {
+            "voice": 1,
+            "type": 3
+        },
+        "npc_dungeon8_npc10": {
+            "voice": 1,
+            "type": 3
+        },
+        "npc_tmnt_shredder": {
+            "voice": 1,
+            "type": 2
+        },
+        "npc_disneyinfinity_maleficent": {
+            "voice": 2,
+            "type": 2
+        },
+        "npc_rtl2promo_lora_ley": {
+            "voice": 2,
+            "type": 2
+        },
+        "npc_yokyo_ninja": {
+            "voice": 1,
+            "type": 1
+        },
+        "npc_yokyo_sumo": {
+            "voice": 1,
+            "type": 1
+        },
+        "npc_yokyo_angry_cook": {
+            "voice": 1,
+            "type": 1
+        },
+        "npc_yokyo_mister_wiagi": {
+            "voice": 1,
+            "type": 1
+        },
+        "npc_yokyo_octopus": {
+            "voice": 1,
+            "type": 1
+        },
+        "npc_yokyo_samurai": {
+            "voice": 1,
+            "type": 1
+        },
+        "npc_gontrilla_roboter": {
+            "voice": 1,
+            "type": 2
+        },
+        "npc_bttf_buff": {
+            "voice": 1,
+            "type": 2
+        },
+        "npc_dungeon9_npc1": {
+            "voice": 1,
+            "type": 3
+        },
+        "npc_dungeon9_npc2": {
+            "voice": 1,
+            "type": 3
+        },
+        "npc_dungeon9_npc3": {
+            "voice": 1,
+            "type": 3
+        },
+        "npc_dungeon9_npc4": {
+            "voice": 1,
+            "type": 3
+        },
+        "npc_dungeon9_npc5": {
+            "voice": 1,
+            "type": 3
+        },
+        "npc_dungeon9_npc6": {
+            "voice": 1,
+            "type": 3
+        },
+        "npc_dungeon9_npc7": {
+            "voice": 1,
+            "type": 3
+        },
+        "npc_dungeon9_npc8": {
+            "voice": 1,
+            "type": 3
+        },
+        "npc_dungeon9_npc9": {
+            "voice": 1,
+            "type": 3
+        },
+        "npc_dungeon9_npc10": {
+            "voice": 1,
+            "type": 3
+        },
+        "npc_summer_olympia_sprinter": {
+            "voice": 1,
+            "type": 1
+        },
+        "npc_summer_olympia_robot": {
+            "voice": 1,
+            "type": 1
+        },
+        "npc_summer_olympia_ice_vendor": {
+            "voice": 1,
+            "type": 1
+        },
+        "npc_egypt_mummy_robot": {
+            "voice": 1,
+            "type": 2
+        },
+        "npc_egypt_mummy": {
+            "voice": 1,
+            "type": 1
+        },
+        "npc_egypt_shark": {
+            "voice": 1,
+            "type": 1
+        },
+        "npc_egypt_pharao": {
+            "voice": 1,
+            "type": 1
+        },
+        "npc_egypt_monkey": {
+            "voice": 1,
+            "type": 1
+        },
+        "npc_egypt_tourists": {
+            "voice": 1,
+            "type": 1
+        },
+        "npc_egypt_guard": {
+            "voice": 1,
+            "type": 1
+        },
+        "npc_egypt_window_cleaner": {
+            "voice": 1,
+            "type": 1
+        },
+        "npc_egypt_evil_kids": {
+            "voice": 3,
+            "type": 1
+        },
+        "npc_egypt_ingenieur": {
+            "voice": 1,
+            "type": 1
+        },
+        "npc_egypt_crocodile": {
+            "voice": 1,
+            "type": 1
+        },
+        "npc_egypt_animator": {
+            "voice": 1,
+            "type": 1
+        },
+        "npc_midsummer_cat": {
+            "voice": 3,
+            "type": 1
+        },
+        "npc_midsummer_rowdy": {
+            "voice": 1,
+            "type": 1
+        },
+        "npc_midsummer_fake_shark": {
+            "voice": 1,
+            "type": 1
+        },
+        "npc_sd1_underwear_tief": {
+            "voice": 1,
+            "type": 5
+        },
+        "npc_sd2_polluter": {
+            "voice": 1,
+            "type": 5
+        },
+        "npc_sd3_dog_gangster": {
+            "voice": 1,
+            "type": 5
+        },
+        "npc_sd4_traffic_offender": {
+            "voice": 1,
+            "type": 5
+        },
+        "npc_sd5_snow_smelter": {
+            "voice": 1,
+            "type": 5
+        },
+        "npc_sd6_shady_sam": {
+            "voice": 1,
+            "type": 5
+        },
+        "npc_sd7_window_cleaner": {
+            "voice": 1,
+            "type": 5
+        },
+        "npc_sd8_hellagio_hammock": {
+            "voice": 1,
+            "type": 5
+        },
+        "npc_sd9_professor": {
+            "voice": 1,
+            "type": 5
+        },
+        "npc_sd10_mustard_scoundrel": {
+            "voice": 1,
+            "type": 5
+        },
+        "npc_sd11_confused_robot_t_rex": {
+            "voice": 1,
+            "type": 5
+        },
+        "npc_sd12_wombatmastermind": {
+            "voice": 1,
+            "type": 5
+        },
+        "npc_sd13_cyborg_samurai": {
+            "voice": 1,
+            "type": 5
+        },
+        "npc_reverse_nerd": {
+            "voice": 1,
+            "type": 2
+        },
+        "npc_racoon": {
+            "voice": 3,
+            "type": 1
+        },
+        "npc_vending_machine": {
+            "voice": 5,
+            "type": 1
+        },
+        "npc_meterman": {
+            "voice": 1,
+            "type": 1
+        },
+        "npc_air_polluter": {
+            "voice": 1,
+            "type": 2
+        },
+        "npc_pacman": {
+            "voice": 1,
+            "type": 2
+        },
+        "npc_sd14_tunnel_drill": {
+            "voice": 5,
+            "type": 5
+        },
+        "npc_carnival_boss": {
+            "voice": 1,
+            "type": 2
+        },
+        "npc_primal_season_worldboss": {
+            "voice": 1,
+            "type": 2
+        },
+        "npc_utopia_season_worldboss": {
+            "voice": 1,
+            "type": 2
+        },
+        "npc_shortsighted_nun": {
+            "voice": 2,
+            "type": 1
+        },
+        "npc_music_enthusiast": {
+            "voice": 1,
+            "type": 1
+        },
+        "npc_nasty_cheerleader": {
+            "voice": 2,
+            "type": 1
+        },
+        "npc_cyclist_rowdy": {
+            "voice": 1,
+            "type": 1
+        },
+        "npc_lonely_satanist": {
+            "voice": 1,
+            "type": 1
+        },
+        "npc_street_dance_twins": {
+            "voice": 1,
+            "type": 1
+        },
+        "npc_overzealous_policewoman": {
+            "voice": 2,
+            "type": 1
+        },
+        "npc_shady_balloon_seller": {
+            "voice": 1,
+            "type": 1
+        },
+        "npc_burglar_duo": {
+            "voice": 1,
+            "type": 2
+        },
+        "npc_pompous_salesman": {
+            "voice": 1,
+            "type": 2
+        },
+        "npc_rude_rocker": {
+            "voice": 1,
+            "type": 2
+        },
+        "npc_real_estate_shark": {
+            "voice": 1,
+            "type": 2
+        },
+        "npc_dystopia_season_worldboss": {
+            "voice": 1,
+            "type": 2
+        },
+        "npc_joker_hacker": {
+            "voice": 1,
+            "type": 1
+        },
+        "npc_cheeky_rumour_spreader": {
+            "voice": 2,
+            "type": 1
+        },
+        "npc_drummer_street_musician": {
+            "voice": 1,
+            "type": 1
+        },
+        "npc_arrogant_skateboarder": {
+            "voice": 1,
+            "type": 1
+        },
+        "npc_scratchy_cat": {
+            "voice": 1,
+            "type": 1
+        },
+        "npc_sausage_thief": {
+            "voice": 1,
+            "type": 1
+        },
+        "npc_media_maniac": {
+            "voice": 1,
+            "type": 1
+        },
+        "npc_opera_singer": {
+            "voice": 1,
+            "type": 1
+        },
+        "npc_alps_alien": {
+            "voice": 3,
+            "type": 1
+        },
+        "npc_fondue_phantom": {
+            "voice": 1,
+            "type": 1
+        },
+        "npc_gourmet_geiss": {
+            "voice": 3,
+            "type": 1
+        },
+        "npc_halloween_boss": {
+            "voice": 2,
+            "type": 6
+        },
+        "npc_halloween_miniboss_1": {
+            "voice": 1,
+            "type": 6
+        },
+        "npc_halloween_miniboss_2": {
+            "voice": 2,
+            "type": 6
+        },
+        "npc_halloween_miniboss_3": {
+            "voice": 1,
+            "type": 6
+        },
+        "npc_halloween_miniboss_4": {
+            "voice": 2,
+            "type": 6
+        },
+        "npc_sleeping_guard": {
+            "voice": 1,
+            "type": 6
+        },
+        "npc_xmas_boss": {
+            "voice": 1,
+            "type": 6
+        },
+        "npc_xmas_miniboss_1": {
+            "voice": 2,
+            "type": 6
+        },
+        "npc_xmas_miniboss_2": {
+            "voice": 1,
+            "type": 6
+        },
+        "npc_xmas_miniboss_3": {
+            "voice": 1,
+            "type": 6
+        },
+        "npc_xmas_miniboss_4": {
+            "voice": 1,
+            "type": 6
+        },
+        "npc_inconvenience_boss": {
+            "voice": 1,
+            "type": 6
+        },
+        "npc_inconvenience_miniboss_1": {
+            "voice": 1,
+            "type": 6
+        },
+        "npc_inconvenience_miniboss_2": {
+            "voice": 1,
+            "type": 6
+        },
+        "npc_inconvenience_miniboss_3": {
+            "voice": 2,
+            "type": 6
+        },
+        "npc_inconvenience_miniboss_4": {
+            "voice": 2,
+            "type": 6
+        },
+        "npc_drwhyfi_boss": {
+            "voice": 1,
+            "type": 6
+        },
+        "npc_drwhyfi_miniboss_1": {
+            "voice": 1,
+            "type": 6
+        },
+        "npc_drwhyfi_miniboss_2": {
+            "voice": 1,
+            "type": 6
+        },
+        "npc_drwhyfi_miniboss_3": {
+            "voice": 1,
+            "type": 6
+        },
+        "npc_drwhyfi_miniboss_4": {
+            "voice": 2,
+            "type": 6
+        }
+    }
+}

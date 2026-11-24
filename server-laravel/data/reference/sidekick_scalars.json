@@ -1,0 +1,16 @@
+{
+ "sidekick_max_level": 30,
+ "sidekick_min_required_level": 60,
+ "sidekick_teaser_level": 30,
+ "sidekick_stat_factor_common": 0.01,
+ "sidekick_stat_factor_rare": 0.01,
+ "sidekick_stat_factor_epic": 0.017,
+ "sidekick_stat_factor_legendary": 0.025,
+ "sidekick_rename_premium_currency_amount": 30,
+ "sidekick_merge_premium_currency_amount": 15,
+ "sidekick_reskill_premium_currency_amount": 1,
+ "sidekick_sew_premium_currency_amount": 5,
+ "item_sidekick_buy_price_factor": 10,
+ "item_sidekick_sell_price_divider": 5,
+ "item_sidekick_sell_price_multiplier": 2
+}

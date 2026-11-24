@@ -1,0 +1,582 @@
+{
+ "team1": {
+  "name": "Padeiro de bombas",
+  "description": "Os padeiros da Associação de Donuts estão de volta, dessa vez desenvolvendo uma bomba calórica com controle remoto que possui uma força explosiva de mais de 14.000 kcal. Bata neles antes que eles possam lançar e disparar a bomba no mercado.",
+  "lost": "Vocês não puderam evitar que a bomba fosse construída. Agora vocês atacam juntos a montanha de calorias e se sacrificam para que não aconteça nada à população em geral. Atributo: +4 kg!",
+  "won": "Demais! Há um clima bombástico entre os nutricionistas: graças a vocês esses pacotes doces de calorias nunca chegarão ao mercado mundial. Vivas ao verdadeiro, ao único donut cor-de-rosa!",
+  "sections": {
+   "always": {
+    "npc_dungeon1_npc2": "Misturador de calorias",
+    "npc_dungeon1_npc3": "Distribuidor de calorias"
+   },
+   "end": {
+    "npc_dungeon1_npc10": "Lançador de bombas de calorias"
+   },
+   "first_half": {
+    "npc_cook": "Engenheiro de calorias",
+    "npc_dungeon2_npc1": "Planejador de calorias"
+   },
+   "second_half": {
+    "npc_business_man_respectable": "Contrabandista de bomba",
+    "npc_cook": "Engenheiro-chefe de calorias"
+   }
+  }
+ },
+ "team2": {
+  "name": "Moleque",
+  "description": "Os moleques estão aprontando de novo. Estão treinando pênaltis na frente das janelas, incendiando formigas com a lente de aumento e colando bilhetes de “chute-me” nas capas dos heróis!! Digam um “não” juntos a essa situação.",
+  "lost": "Após alguns momentos embaraçadores as capas de vocês estão cheios de dizeres idiotas e pichações de giz. Vocês precisam de um momentinho para recuperarem a própria imagem e o orgulho. Não deixem que façam isso!",
+  "won": "A trupe colorida de heróis fantasiados de vocês avança em direção aos moleques engraçadinhos. Parece duro mas dá resultado: os moleques tomam jeito rapidinho, só tiram boas notas e escovam os dentes durante longos 3 minutos!",
+  "sections": {
+   "end": {
+    "npc_hoody_very_evil": "Chefe de gangue"
+   },
+   "first_half": {
+    "npc_kids_one_evil": "Kevin",
+    "npc_kids_two_evil": "Boris e Ben",
+    "npc_kids_two_laughing": "Jorge, Max e Sílvio"
+   },
+   "second_half": {
+    "npc_kids_one_evil": "Manuel",
+    "npc_kids_two_evil": "Igor e Sam",
+    "npc_kids_two_laughing": "Paulo, Diego e Marcos"
+   }
+  }
+ },
+ "team3": {
+  "name": "Os Masterminds",
+  "description": "Eles são obstinados, caóticos e meio doidos: os Masterminds. Infelizmente suas experiências fogem do controle com frequência (como por exemplo o liquidificador falante com braços). Detenham essa loucura!",
+  "lost": "Os Masterminds malucos levam vocês à loucura e a sanduicheira elétrica acesa é a gota d’água que faltava. Voltem a si com calma e tentem mais uma vez com toda a força!",
+  "won": "Bom! Depois que vocês acabaram com a loucura dos Masterminds ainda têm que pegar três aparelhos elétricos de cozinha pirados. Isso vocês conseguem fácil (apesar do quebra-nozes com chat beliscar um pouco).",
+  "sections": {
+   "always": {
+    "npc_dungeon3_npc6": "Engenheiro maluco",
+    "npc_mad_scientist": "Inventor maluco"
+   },
+   "end": {
+    "npc_prof_evil": "Professor Maluco"
+   },
+   "first_half": {
+    "npc_mastermind": "Planejador maluco"
+   },
+   "second_half": {
+    "npc_c3_d2": "Robô maluco"
+   }
+  }
+ },
+ "team4": {
+  "name": "Representação do representante",
+  "description": "A representação dos representantes representa todos os representantes do mundo e distribui tabelas cada vez mais compridas e entediantes. Em nome de todas as donas-de-casa à beira de um ataque de nervos: um chute no traseiro deles cai bem.",
+  "lost": "Vocês deixaram que os representantes os convencessem e lhes dessem chutes. Isso doeu bastante. Agora sejam super-heróis de verdade e não desistam! Essas tabelas cruzadas com 8 dobras não podem levar ninguém ao tédio mortal!",
+  "won": "Até o combate com representantes é extremamente entediante! Mas no final das contas vocês combateram rolos de papel sem fim e gravatas compridas demais. Agora qualquer domicílio fica devendo um cafezinho a vocês.",
+  "sections": {
+   "end": {
+    "npc_dungeon2_npc1": "Representante maioral"
+   },
+   "first_half": {
+    "npc_business_man_artless": "Representante normal",
+    "npc_business_man_respectable": "Representante esperto"
+   },
+   "second_half": {
+    "npc_business_man_threatening": "Representante engomadinho",
+    "npc_dungeon1_npc4": "Representante do representante"
+   }
+  }
+ },
+ "team5": {
+  "name": "Dublê de Elvis",
+  "description": "Um grupo de dublês de Elvis se juntou e quer o domínio sobre todo o país. Já que são reis. Façam com que esta trupe nostálgica volte à razão.",
+  "lost": "Esses dublês endiabrados espalharam amendocrem e gomalina no chão! Um chão assim significa uma clara vantagem local para os topetes encerados de plantão. Quando a coisa secar, tentem de novo!",
+  "won": "Juntos vocês colocam os dublês de Elvis de volta nos seus tapetes vermelhos. Vocês não conseguem tirar totalmente o sonho das majestades mas eles pelo menos aceitaram o título de “Rei de Honra”.",
+  "sections": {
+   "always": {
+    "npc_elvis": "Dublê de Elvis"
+   },
+   "end": {
+    "npc_elvis": "Último dublê de Elvis"
+   },
+   "first_half": {
+    "npc_dungeon3_npc5": "Péssimo dublê de Elvis"
+   },
+   "second_half": {
+    "npc_dungeon3_npc10": "Dublê de Elvis muito ruim"
+   }
+  }
+ },
+ "team6": {
+  "name": "Ladrão de banco",
+  "description": "Ladrões de banco entraram no “Banco de Moedas InterInflacionário”! Estão ameaçando os funcionários com qualquer coisa, estão fantasiados de modo estranho e querem muitas moedas – imediatamente. Estejam lá e façam justiça.",
+  "lost": "Contrariados vocês saem de campo e deixam que eles saiam carregando sacos cheios de moedas. Mas tudo isso não foi um assalto. É, ricos também podem se fantasiar. Que sorte!",
+  "won": "Ótimo! Mas como ficou claro os senhores simplesmente vieram de um baile à fantasia e queriam fazer um saque de muitíssimas moedas para comprar um iate cor-de-rosa. É, e também pareciam estar de pileque...",
+  "sections": {
+   "end": {
+    "npc_dungeon3_npc4": "Ladrão de banco com a melhor fantasia"
+   },
+   "first_half": {
+    "npc_dungeon2_npc2": "Ladrão de banco mal fantasiado",
+    "npc_dungeon2_npc5": "Ladrão de banco mal fantasiado",
+    "npc_dungeon2_npc6": "Ladrão de banco mal fantasiado"
+   },
+   "second_half": {
+    "npc_dungeon2_npc4": "Ladrão de banco bem fantasiado",
+    "npc_dungeon2_npc9": "Ladrão de banco bem fantasiado",
+    "npc_revenger": "Ladrão de banco bem fantasiado"
+   }
+  }
+ },
+ "team7": {
+  "name": "A juventude de hoje em dia",
+  "description": "A juventude de hoje em dia aporrinha qualquer um e azucrina seus pobres colegas de classe. Mas isso não tem jeito... Não tem jeito? Claro que sim! Controlem-se, falem com eles e melhorem o mundo!",
+  "lost": "Quando vocês estão no chão, a juventude de hoje em dia começa a apoquentar vocês de verdade. Aí só tem um jeito: deem exemplo! Não se aborreçam e procurem a “conversa neutra” com eles.",
+  "won": "Depois que vocês “conversaram” com todo tipo de jovem a paz volta a ser estabelecida rapidamente. Mas ela só dura algumas horas. Ah, a juventude de hoje em dia!",
+  "sections": {
+   "end": {
+    "npc_kids_two_evil": "Os maiorais"
+   },
+   "first_half": {
+    "npc_hoody_evil": "Sujeito descansado",
+    "npc_hoody_scruffy": "Sujeito relax",
+    "npc_hoody_very_evil": "Sujeito rude"
+   },
+   "second_half": {
+    "npc_hoody_evil": "Sujeito maneiro",
+    "npc_hoody_scruffy": "Sujeito bacana",
+    "npc_hoody_very_evil": "Sujeito radical"
+   }
+  }
+ },
+ "team8": {
+  "name": "Laboratorista secreto",
+  "description": "Em um laboratório secreto debaixo de uma fábrica de sopas alguns engenheiros e outros causadores de confusão criam as próprias receitas: eles estão construindo um robô de guerra! Desmontem essa coisa, rápido!",
+  "lost": "Os engenheiros criaram alguns movimentos especiais com os quais podem desviar de vocês enquanto eles continuam trabalhando. Desenvolvam uma resposta a isso e arregacem as mangas heroicas!",
+  "won": "Depois que vocês desmontaram cuidadosa e completamente este monte de lataria velha precisam ainda explicar aos laboratoristas qual é o perigo dos robôs de guerra. Eles ficam chocados e morrem de vergonha.",
+  "sections": {
+   "end": {
+    "npc_c3_d2": "Robô de guerra"
+   },
+   "first_half": {
+    "npc_dungeon1_npc6": "Engenheiro magricela",
+    "npc_dungeon1_npc7": "Engenheiro"
+   },
+   "second_half": {
+    "npc_cheater": "Engenheiro magnético e randômico",
+    "npc_dungeon3_npc6": "Engenheiro de bobina de Tesla",
+    "npc_mad_scientist": "Engenheiro de cabo de alta tensão"
+   }
+  }
+ },
+ "team9": {
+  "name": "Limpadores destrutores de janelas",
+  "description": "Esse grupo limpa as janelas durante tanto tempo com Bombril até elas desaparecerem. Daí vem outros colegas e montam janelas novas e sujas no lugar. Um círculo vicioso! Passem um sabão nesse grupo de vigaristas!",
+  "lost": "A trupe da faxina acabou com a roupa de Nerd de vocês! Nenhum herói pode ser tão limpinho: depois desse fracasso vocês espalham um pouco de aerossol de queijo nas suas capas – melhor assim! E agora mais uma vez do início!",
+  "won": "Vocês limpam e enceram as caras dos arranha-janelas e deram uma lição de vida mais uma vez: o grupo promete limpar as janelas com no máximo (!) papel-lixa daqui pra frente.",
+  "sections": {
+   "always": {
+    "npc_kids_one_evil": "Estagiário colegial"
+   },
+   "end": {
+    "npc_mafioso_godfather": "Padrinho da trupe da faxina"
+   },
+   "first_half": {
+    "npc_dungeon3_npc8": "“Escovinha”, “Espuma” e Máximo"
+   },
+   "second_half": {
+    "npc_dungeon3_npc8": "Bob, Zé e João Paulo Henrique"
+   }
+  }
+ },
+ "team10": {
+  "name": "APE",
+  "description": "A Associação das Pessoas Estressadas (APE) consiste em gerentes com sobrecarga de trabalho que se encontram de noite para encorajarem-se uns aos outros a trabalharem ainda mais. Falem com eles e lhes receitem férias forçadas.",
+  "lost": "Mais uma vez vocês criaram muitíssimo estresse. Assim os senhores se animaram mais ainda! Agora é que vão mesmo pôr mãos à obra. Aumentar o PIB. Falem com eles mais uma vez!",
+  "won": "Parabéns! Depois que vocês conseguiram a compreensão, pegaram um globo terrestre girando-o loucamente para determinar os destinos das férias: a Sibéria, o Oceano Pacífico e a Ilha Yoyo. Aproveitem!",
+  "sections": {
+   "always": {
+    "npc_business_man_artless": "Contador na Tanto Faz & Filhos",
+    "npc_dungeon1_npc8": "Alguma Coisa de Departamento na Corp. Inc."
+   },
+   "end": {
+    "npc_sillycon_valley_stressed_manager": "Primeiro Principal Presidente da Diretoria"
+   },
+   "first_half": {
+    "npc_dungeon3_npc7": "Alguma Coisa do Financeiro na Em Algum Lugar SA",
+    "npc_sillycon_valley_boss": "Diretor de Recursos Humanos da Alguma Coisa Ltda."
+   },
+   "second_half": {
+    "npc_dungeon3_npc9": "Diretor da Firma Padrão SubSolo"
+   }
+  }
+ },
+ "team11": {
+  "name": "Colegas do Curso de Esqui",
+  "description": "A sua trupe de heróis decide cuidar do corpo e ir esquiar na neve. Sejam melhores do que os outros iniciantes na pista dos calouros. Evitem que sejam atropelados e subam ao monte dos bobocas.",
+  "lost": "Deve ser uma imagem interessante como uma trupe de super-heróis coloridos cai um depois do outro de cara na neve. Descongelem-se com algumas xícaras de leite quente de baunilha e recomecem com impulso renovado!",
+  "won": "Não importa o que está por vir: vocês não arredam pé! Não cedem! Não desistem nunca! Mantém a real valentia de um herói!! Depois de 150 metros vocês finalmente conseguiram chegar ao cume do monte de quase 10 metros! Que façanha!",
+  "sections": {
+   "end": {
+    "npc_dungeon3_npc4": "Alucinação de vertigem de altura"
+   },
+   "first_half": {
+    "npc_dungeon3_npc1": "Novato Menor de Idade",
+    "npc_dungeon3_npc5": "Professor de esqui desesperado"
+   },
+   "second_half": {
+    "npc_dungeon3_npc2": "Novato Maior de Idade",
+    "npc_dungeon3_npc3": "Trupe de música tirolesa de alto volume"
+   }
+  }
+ },
+ "team12": {
+  "name": "Agentes secretos",
+  "description": "Esta associação de agentes secretos está escondendo alguma coisa: uma arma secreta que só poderá ser usada pelos aliados. Evitem este ato de guerra e destruam a arma secreta antes que ela possa causar algum dano!",
+  "lost": "Vocês se deixaram parar pelos agentes secretos! Penteiem os cabelos, calibrem os seus dispositivos, limpem suas pistolas d’água e tentem de novo! A paz mundial está em jogo! ... Talvez!",
+  "won": "Quem poderia imaginar uma coisa destas? A arma secreta é um cozinheiro! Ele poderia ter exportado sua péssima comida. Um ataque de tocaia sórdido, silencioso e rasteiro! Que bom que vocês evitaram que isso acontecesse!",
+  "sections": {
+   "always": {
+    "npc_business_man_threatening": "Segurança Nível de segurança 1",
+    "npc_dungeon2_npc8": "Segurança Nível de segurança 2"
+   },
+   "end": {
+    "npc_cook": "Arma secreta: Cozinheiro Ruim"
+   },
+   "first_half": {
+    "npc_dungeon1_npc1": "Segurança Nível de segurança 0"
+   },
+   "second_half": {
+    "npc_dungeon2_npc9": "Segurança Nível de segurança 3"
+   }
+  }
+ },
+ "team13": {
+  "name": "Circo Picadinho",
+  "description": "O que as pessoas não fazem por fama e grana? O Circo Picadinho pensou em números artísticos audaciosos (saltar por aros em fogo a 40 metros de altura e aterrissar em cima de um fio de nylon). Parem com essa loucura!",
+  "lost": "Vocês invadem a cena no meio do show e perseguem os artistas escalando tudo. Nas alturas vocês se equilibram sem dispositivos de segurança por cima do picadeiro... e levam na cabeça. O público aplaude e doa moedas...",
+  "won": "A trupe de heróis de vocês invadem a cena no meio do show, sobem às alturas atrás dos artistas e os param lá em cima. Vocês são uma turma graciosa (e bem fantasiada)! Querem saber onde podem vê-los ao vivo...",
+  "sections": {
+   "always": {
+    "npc_dungeon2_npc4": "Palhaço para experiências com hélio",
+    "npc_joker": "Palhaço audacioso"
+   },
+   "end": {
+    "npc_dark_father": "Primeiro humano “voador”..."
+   },
+   "first_half": {
+    "npc_magicians": "Mágico eufórico"
+   },
+   "second_half": {
+    "npc_dungeon3_npc4": "“Animal” “domesticado”"
+   }
+  }
+ },
+ "team14": {
+  "name": "Ocupadores do Castelo Assombrado",
+  "description": "Algumas pessoas gostam tanto de ficar no Castelo Assombrado que se fantasiam de personagens assombrados e assustam os visitantes. Problema: o Castelo Assombrado é na verdade uma Prefeitura na qual as pessoas gostariam de trabalhar.",
+  "lost": "Vocês ficaram com medo só da missão de vocês. Mas isto vocês sabem fazer melhor. Vistam algumas roupas mais arrumadas e mostrem aos moradores do Castelo o que significa estar bem fantasiado. E onde fica a porta de saída da Prefeitura.",
+  "won": "Agora vocês até ficaram um pouco tristes depois que engravatados cinzentos ocuparam a casa após a expulsão da trupe colorida . Mas, já que vocês estão aqui: preencham o formulário relatando o motivo da visita.",
+  "sections": {
+   "always": {
+    "npc_dungeon3_npc6": "Departamento 4: Energias rentáveis",
+    "npc_prof_evil": "Departamento 10: Pesquisa e Vácuo",
+    "npc_sergant": "Departamento 9: Assuntos Externos"
+   },
+   "end": {
+    "npc_dungeon2_npc5": "Departamento para segurança aérea e todo o resto"
+   },
+   "first_half": {
+    "npc_dungeon2_npc7": "Departamento 83: Cartório",
+    "npc_dungeon2_npc9": "Departamento 3: Análises",
+    "npc_elvis": "Departamento 307: Conselho Ministerial Educativo"
+   },
+   "second_half": {
+    "npc_cook": "Departamento 38: Conselho de Serviço A",
+    "npc_dungeon2_npc2": "Departamento 76: Gabinete do Prefeito",
+    "npc_dungeon2_npc6": "Departamento 38: Conselho de Serviço B",
+    "npc_halloween_ghost": "Departamento -1: Ministro de Para ciências"
+   }
+  }
+ },
+ "team15": {
+  "name": "Trupe de Vingança Autônomo",
+  "description": "Um grupo de vigaristas e malfeitores frustrados reuniu-se contra vocês, heróis. Objetivo declarado deles: fazer vocês pararem e poderem ser malvados em paz! Objetivo declarado de vocês: o oposto!",
+  "lost": "Os verdugos frustrados estão muito contentes de finalmente terem conseguido algum êxito. Agora vão dominar o mundo – pelo menos conforme o plano. Voltem lá imediatamente! Contem uma história diferente!",
+  "won": "Vocês frustraram tanto os malfeitores que eles estão quase chorando. Simpáticos como vocês só vocês sabem ser, no final até dizem algumas palavras de consolo e compartilham alguns donuts. E o mundo já volta a sua ordem! Pelo menos por enquanto...",
+  "sections": {
+   "always": {
+    "npc_dungeon1_npc9": "Sujeito “pavio curto” irritado"
+   },
+   "end": {
+    "npc_prof_evil": "Chefe irado"
+   },
+   "first_half": {
+    "npc_dark_father": "Usuário de capa com mania de grandeza",
+    "npc_joker": "Otimista mau"
+   },
+   "second_half": {
+    "npc_revenger": "Vingador sério",
+    "npc_sergant": "Traidor desdenhoso"
+   }
+  }
+ },
+ "team16": {
+  "name": "Convidados da festa",
+  "description": "Numa festa brega uma briga começa para ver quem tem a pior fantasia. Passem lá como turma do deixa deixa-disso e apartem esse bando de péssimo gosto.",
+  "lost": "Vocês não conseguem apartar a briga já que vocês são da opinião que vocês mesmos merecem o prêmio do mau gosto. Vocês se deixaram levar pelo ambiente... Mais uma vez! Mas, por favor, como profissionais, que vocês são.",
+  "won": "Depois que vocês acalmaram os ânimos, os convidados da festa tem uma visão mais clara: Claro que o prêmio de mau gosto é de vocês e de mais ninguém! Viva!",
+  "sections": {
+   "end": {
+    "npc_magicians": "Provavelmente a pior fantasia"
+   },
+   "first_half": {
+    "npc_dark_father": "Fantasia chata",
+    "npc_dungeon2_npc5": "Fantasia até passável"
+   },
+   "second_half": {
+    "npc_dungeon3_npc6": "Fantasia “que era aquilo?”",
+    "npc_hoody_scruffy": "Fantasia provavelmente involuntária"
+   }
+  }
+ },
+ "team17": {
+  "name": "Burocratas em tempo integral",
+  "description": "Os burocratas no Senado querem acabar com a produção de donuts porque o travesseiro de carimbo para a autorização correspondente secou. Em nome de... bem, em nome de toda a população: ao ataque!",
+  "lost": "Sabe-se que “tinta não é água”. É, e esse é o caso nesse caso. Na próxima vez vocês deveriam dar uma lição nesses discursadores de parágrafos. Senão vocês podem ser taxados como “não perigosos”...",
+  "won": "Vocês deixaram a própria marca e carimbaram essa besteira toda abrindo caminho para a economia livre de donuts! Ótimo! E assim não existe ninguém no mundo que não esteja grato a vocês! (Pelo menos ninguém sem status de funcionário público...)",
+  "sections": {
+   "end": {
+    "npc_dungeon3_npc9": "Burocrata principal responsável"
+   },
+   "first_half": {
+    "npc_dungeon3_npc7": "Burocrata fumante",
+    "npc_mafioso_godfather": "Burocrata decadente"
+   },
+   "second_half": {
+    "npc_business_man_artless": "Burocrata ficha limpa",
+    "npc_dungeon2_npc1": "Burocrata chato"
+   }
+  }
+ },
+ "team18": {
+  "name": "Esnobes ricos",
+  "description": "Enganação! Esses senhores deram dinheiro de presente uns aos outros por tanto tempo até que cada um deles tenha ficado rico. Nesse processo deram um calote no imposto de renda de fantastilhões de moedas. Levem-nos à justiça!",
+  "lost": "O abismo entre ricos e pobres separa vocês da vitória merecida: esses esnobes são ricos e poderosos demais e não estão ao alcance de vocês. (Isto é uma mentira. Tentem de novo!)",
+  "won": "Bem... O dinheiro pode comprar tudo. Com exceção do amor. E fora uma vitória contra a trupe de super-heróis de vocês. Dos impostos recuperados a cidade vai construir uma piscina. Oba!",
+  "sections": {
+   "end": {
+    "npc_dungeon3_npc10": "Esnobe mais rico de todos os tempos"
+   },
+   "first_half": {
+    "npc_dungeon1_npc8": "Esnobe bastante rico",
+    "npc_loser": "Esnobe ainda não tão rico"
+   },
+   "second_half": {
+    "npc_dungeon1_npc10": "Esnobe riquíssimo",
+    "npc_mafioso_godfather": "Esnobe muito rico"
+   }
+  }
+ },
+ "team19": {
+  "name": "Guerreiros clonados",
+  "description": "Será verdade? Parece que a Yoyodyne criou guerreiros clonados! Um exército de brigões obedientes! Passem lá o mais rápido possível e eliminem o laboratório de clonagem!",
+  "lost": "Sempre a mesma coisa: a monotonia dos combates foi tão entediante que vocês cometeram erros fatais. Erros de principiante! Então: recomecem!",
+  "won": "O laboratório de clonagem é na verdade o banheiro de uma família muito numerosa e os clones são uma turma de gêmeos... tri... quadri... multigêmeos univitelinos! Vocês resolvem poupar o banheiro. O trabalho de vocês aqui terminou.",
+  "sections": {
+   "always": {
+    "npc_dark_father": "Guerreiro clonado"
+   },
+   "end": {
+    "npc_dark_father": "Guerreiro clonado"
+   },
+   "first_half": {
+    "npc_dark_father": "Guerreiro clonado"
+   },
+   "second_half": {
+    "npc_dark_father": "Guerreiro clonado"
+   }
+  }
+ },
+ "team20": {
+  "name": "Agência de Doping",
+  "description": "Fala-se muito sobre escândalos de doping. Como time vocês finalmente encontraram A agência de doping. Lá trabalham com taurina, sacarina, cafeína E teína. Sem brincadeira! Liberem as pobres vítimas.",
+  "lost": "Estufados até o talo com substâncias que aumentam o rendimento estes sobre-humanos dopados não dão nenhuma chance a vocês. Vocês deveriam comer alguns donuts e frutas antes de iniciar o próximo ataque.",
+  "won": "Finalmente vocês liberaram as vítimas do mundo do doping! Foi bastante cara-de-pau da parte da agência de doping terem se identificado pra vocês como inofensivos nutricionistas...",
+  "sections": {
+   "end": {
+    "npc_dungeon3_npc5": "Nutricionista John"
+   },
+   "first_half": {
+    "npc_animator": "Vítima de doping inconsciente",
+    "npc_dungeon1_npc9": "Vítima de doping consciente"
+   },
+   "second_half": {
+    "npc_mad_scientist": "Vítima de doping cerebral consciente",
+    "npc_mastermind": "Vítima de doping cerebral inconsciente"
+   }
+  }
+ },
+ "team21": {
+  "name": "Peões de obra",
+  "description": "Estes peões de obra estão pouco interessados na sua própria obra. Ao invés disso estão fazendo buracos nas ruas e estão cimentando as portas das casas à vontade. Mostre a eles onde fica o martelo!",
+  "lost": "Sem vocês se darem conta, os trabalhadores do site de obras cimentaram os seus pés na calçada, colocaram martelo e talhadeira na suas mãos e deram no pé rindo. Libertem-se e peguem-nos!",
+  "won": "Como um muro de concreto armado vocês cortam o caminho do grupo e detém as atividades deles. Os criadores de confusão não vão mais cimentar nada!",
+  "sections": {
+   "end": {
+    "npc_dungeon8_npc8": "Chefe manipulador mal-encarado"
+   },
+   "first_half": {
+    "npc_dungeon5_npc7": "Cúmplice entediado",
+    "npc_dungeon8_npc4": "Especialista em concreto barbudo"
+   },
+   "second_half": {
+    "npc_dungeon5_npc6": "Betoneira malvada",
+    "npc_dungeon5_npc8": "Armador de aço cheio de músculos"
+   }
+  }
+ },
+ "team22": {
+  "name": "Os robôs",
+  "description": "Em Yollywood, alguns robôs malucos estão desmontando um cenário depois do outro! Leve-os para uma oficina, rápido!",
+  "lost": "Ai, os robôs bateram pra valer em vocês. Comecem uma nova tentativa antes que as máquinas tenham a brilhante ideia de invadir a cidade!",
+  "won": "Com todas as forças reunidas e alguns baldes de água vocês causam vários curtos-circuitos em série. Pelo menos conseguiram desativar as máquinas por enquanto.",
+  "sections": {
+   "end": {
+    "npc_winterolympics_yeti": "Robô cavernoso enorme"
+   },
+   "first_half": {
+    "npc_c3_d2": "Robô de protocolo falando pelos cotovelos",
+    "npc_olympia_robot_small": "Pequeno robô figurante"
+   },
+   "second_half": {
+    "npc_kangaroo": "Robô-canguru",
+    "npc_zombie": "Robô-zumbi"
+   }
+  }
+ },
+ "team23": {
+  "name": "Cobrador",
+  "description": "Alguns cobradores sem-vergonha querem tirar dinheiro das senhoras da redondeza. É hora de tirar esse plano pérfido da cabeça deles!",
+  "lost": "Os cobradores percebem que podem tirar bastante dinheiro de vocês. Não deixem isso ficar assim! Pra cima deles!",
+  "won": "Vocês acabaram com as más intenções dos cobradores e os “convenceram” a fazerem companhia às senhoras durante o lanche com bolo.",
+  "sections": {
+   "end": {
+    "npc_dungeon3_npc10": "Mafiosos gananciosos"
+   },
+   "first_half": {
+    "npc_dungeon1_npc4": "Sujeito sabonete",
+    "npc_dungeon8_npc9": "Cobrador bem vestido"
+   },
+   "second_half": {
+    "npc_business_man_respectable": "Cobrador de meter medo",
+    "npc_dungeon1_npc9": "Cobrador cheio de músculos"
+   }
+  }
+ },
+ "team24": {
+  "name": "Alienígenas",
+  "description": "Num depósito um grupo de alienígenas está planejando dominar a Terra. Um momento: alienígenas!? Tanto faz quem ou o que, um plano destes não pode funcionar!",
+  "lost": "Os alienígenas não gostaram de serem interrompidos por vocês durante a reunião. Com algumas bombas d’água eles forçam a bater em retirada. Por enquanto!",
+  "won": "Vocês salvaram o mundo dos alienígenas! Ou pelo menos de alguns sujeitos que estavam jogando War fantasiados de alienígenas. De qualquer modo, o mundo agora está mais seguro!",
+  "sections": {
+   "always": {
+    "npc_dungeon7_npc4": "Alienígena de 2+4 braços",
+    "npc_dungeon7_npc5": "Secretário alienígena"
+   },
+   "end": {
+    "npc_dungeon7_npc10": "Chefe alienígena"
+   },
+   "first_half": {
+    "npc_dungeon7_npc7": "Mecânico alienígena"
+   },
+   "second_half": {
+    "npc_dungeon7_npc3": "Alienígena peludo"
+   }
+  }
+ },
+ "team25": {
+  "name": "Sindicato",
+  "description": "O sindicato dos empregados sobre qualificados com micro empregos está fazendo greve. Os jornais não estão sendo entregues, não há cachorros-quentes à venda na praça e o vendedor de pipoca no cinema também está faltando. Faça os grevistas recuperarem a razão!",
+  "lost": "Os grevistas não querem saber de nada. Assumam um dos turnos deles e tentem novamente depois.",
+  "won": "Depois de cansativas negociações tarifárias vocês oferecem aos micro empregados um pagamento de bônus em vale-cafezinhos. Eles se convenceram!",
+  "sections": {
+   "always": {
+    "npc_cook": "Cozinheiro em meio-expediente",
+    "npc_dungeon2_npc3": "Pipoqueiro",
+    "npc_dungeon2_npc6": "Mascote da Mesbla"
+   },
+   "end": {
+    "npc_dungeon8_npc5": "Salva-vidas em meio-expediente"
+   },
+   "first_half": {
+    "npc_winterolympics_iceman": "Vendedor de sorvete",
+    "npc_worldcup_hotdog_vendor": "Vendedor de cachorro-quente"
+   },
+   "second_half": {
+    "npc_halloween_ghost": "Ajudante de trem-fantasma",
+    "npc_nastier_employee": "Frentista"
+   }
+  }
+ },
+ "team26": {
+  "name": "Cientistas malucos",
+  "description": "Uma liga secreta de professores malucos estão tentando sintetizar donuts no laboratório de alquimia da escola para enfrentar a concorrência da fábrica de donuts. Isso é loucura! Tentem deter essas tentativas imediatamente!",
+  "lost": "Chegando no laboratório os donuts tem um cheirinho maravilhoso... Mas não foi uma boa ideia prová-los, pois deram muita dor-de-barriga. Recuperem-se e tentem novamente!",
+  "won": "A tentativa de vocês deu certo! Quando vocês fazem os cientistas provarem os donuts falsos, eles admitem que foi uma ideia boba. Bem feito!",
+  "sections": {
+   "always": {
+    "npc_dungeon1_npc2": "Misturador de massa"
+   },
+   "end": {
+    "npc_prof_evil": "Professor Chefe"
+   },
+   "first_half": {
+    "npc_dungeon1_npc5": "Degustador",
+    "npc_mad_scientist": "Professor pirado"
+   },
+   "second_half": {
+    "npc_dungeon4_npc8": "Calculador de fórmulas",
+    "npc_mad_scientist": "Professor de química doido"
+   }
+  }
+ },
+ "team27": {
+  "name": "Tubarões imobiliários",
+  "description": "Um sindicato de tubarões imobiliários está alugando apartamentos que parecem reformados, mas que na verdades estão caindo aos pedaços, a preços exagerados. Vocês precisam fazer-lhes uma visitinha!",
+  "lost": "A ladainha de vendedor profissional dos tubarões imobiliários deixou vocês tão confusos que vocês alugaram uma nova sede heroica com eles. Mas há um buraco enorme no telhado. Enfrentem-os mais uma vez!",
+  "won": "Vocês não poderiam ter uma aparição mais convincente! Os tubarões imobiliários vão ter que pagar uma indenização altíssima.",
+  "sections": {
+   "always": {
+    "npc_dungeon5_npc2": "Vendedor esperto"
+   },
+   "end": {
+    "npc_dungeon4_npc10": "CEO da Tubarões Aluguéis Ltda."
+   },
+   "first_half": {
+    "npc_business_man_artless": "Executivo chato",
+    "npc_dungeon1_npc4": "Engravatado parecendo sério"
+   },
+   "second_half": {
+    "npc_dungeon2_npc10": "Executivo convincente",
+    "npc_mafioso_godfather": "Capanga pérfido"
+   }
+  }
+ },
+ "team28": {
+  "name": "Artistas malucos",
+  "description": "O famoso pintor francês Fabien Farbé reuniu os seus seguidores e está jogando bombas de tinta nos muros da cidade. Ele está chamando isso de arte! Deem um basta nisso!",
+  "lost": "Vocês não imaginavam que acabaria assim. Vocês estão cheios de tinta dos pés à cabeça e batem em retirada. Vamos ao chuveiro e tentem novamente!",
+  "won": "Vocês tratam esta “arte” com solvente. Monsieur Farbé imaginava tudo bem diferente. Ele desiste frustrado e diz que no futuro vai se concentrar de novo em naturezas mortas com foco em donuts.",
+  "sections": {
+   "always": {
+    "npc_artist": "Aprendiz Farbé pirado"
+   },
+   "end": {
+    "npc_paris_gredin": "Fabien Farbé"
+   },
+   "first_half": {
+    "npc_paris_thief": "Farbéista mascarado"
+   },
+   "second_half": {
+    "npc_artist": "Seguidor de Farbé"
+   }
+  }
+ }
+}

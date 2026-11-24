@@ -23,7 +23,7 @@ final class GameData
             'network'                  => '',
             'locale'                   => $locale,
             'registration_source'      => 'email',
-            'ts_creation'              => time(),
+            'ts_creation'              => GameTime::now(),
             'confirmed'                => true,
             'premium_currency'         => 0,
             'blocked_premium_currency' => 0,
@@ -79,8 +79,8 @@ final class GameData
 
             // treino
             'active_training_id'          => 0,
-            'training_energy'             => 100,
-            'max_training_energy'         => 100,
+            'training_energy'             => 30,
+            'max_training_energy'         => 30,
             'training_count'              => 0,
             'max_training_count'          => 3,
 

@@ -1,0 +1,93 @@
+name: herozero
+x-php: &php
+  image: herozero-php:local
+  restart: unless-stopped
+  depends_on:
+    db:
+      condition: service_healthy
+  volumes:
+    - .:/workspace
+    - game_vendor:/workspace/server-laravel/vendor
+    - admin_vendor:/workspace/admin-laravel/vendor
+    - game_cache:/workspace/server-laravel/bootstrap/cache
+    - admin_cache:/workspace/admin-laravel/bootstrap/cache
+  healthcheck:
+    test: [CMD, php, -r, "exit(@file_get_contents('http://127.0.0.1/up') === false ? 1 : 0);"]
+    interval: 10s
+    timeout: 5s
+    start_period: 120s
+    retries: 12
+x-env: &env
+  HZ_DB_HOST: db
+  HZ_DB_PORT: 3306
+  HZ_DB_NAME: herozero
+  HZ_DB_USER: root
+  HZ_DB_PASS: ${HZ_MYSQL_PASSWORD:-herozero}
+  DB_CONNECTION: mysql
+  DB_HOST: db
+  DB_PORT: 3306
+  DB_DATABASE: herozero
+  DB_USERNAME: root
+  DB_PASSWORD: ${HZ_MYSQL_PASSWORD:-herozero}
+  CACHE_STORE: file
+  SESSION_DRIVER: file
+  HZ_GAME_TZ: Europe/Lisbon
+services:
+  db:
+    image: mysql:8.4
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${HZ_MYSQL_PASSWORD:-herozero}
+      MYSQL_DATABASE: herozero
+    command: [--character-set-server=utf8mb4, --collation-server=utf8mb4_unicode_ci, --sql-mode=NO_ENGINE_SUBSTITUTION]
+    ports: ["127.0.0.1:3308:3306"]
+    volumes:
+      - ./docker/mysql-data:/var/lib/mysql
+      - ./server-laravel/docker/initdb:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: [CMD-SHELL, 'MYSQL_PWD="$$MYSQL_ROOT_PASSWORD" mysqladmin ping -h localhost -uroot --silent']
+      interval: 5s
+      timeout: 5s
+      retries: 30
+  game:
+    <<: *php
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        APP_UID: ${HZ_UID:-1000}
+        APP_GID: ${HZ_GID:-1000}
+    environment:
+      <<: *env
+      VIEW_COMPILED_PATH: /workspace/server-laravel/bootstrap/cache/views
+      APP_DIR: server-laravel
+      APP_PUBLIC: /workspace/server-laravel/public
+      APP_URL: http://127.0.0.1:${HZ_GAME_PORT:-8080}
+      HZ_SOCKET_PUSH_URL: http://socket:8090/push
+      HZ_SOCKET_URL: http://127.0.0.1:8090
+      HZ_SOCKET_TOKEN: ${HZ_SOCKET_TOKEN:-local-dev-token}
+    ports: ["127.0.0.1:${HZ_GAME_PORT:-8080}:80"]
+  admin:
+    <<: *php
+    environment:
+      <<: *env
+      VIEW_COMPILED_PATH: /workspace/admin-laravel/bootstrap/cache/views
+      APP_DIR: admin-laravel
+      APP_PUBLIC: /workspace/admin-laravel/public
+      APP_URL: http://127.0.0.1:8001
+      HZ_GAME_SERVER: http://game
+    ports: ["127.0.0.1:8001:80"]
+  socket:
+    build:
+      context: .
+      dockerfile: Dockerfile.socket
+    restart: unless-stopped
+    environment:
+      HZ_SOCKET_HOST: 0.0.0.0
+      HZ_SOCKET_TOKEN: ${HZ_SOCKET_TOKEN:-local-dev-token}
+    ports: ["127.0.0.1:8090:8090"]
+volumes:
+  game_vendor:
+  admin_vendor:
+  game_cache:
+  admin_cache:

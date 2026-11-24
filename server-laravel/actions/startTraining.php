@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+use HeroZero\GameTime;
+
 use HeroZero\Character;
 use HeroZero\Live;
 
@@ -16,7 +18,7 @@ return function (array $params): array {
         'current_goal_values' => [
             'trainings_started' => 1,
         ],
-        'server_time' => time(),
+        'server_time' => GameTime::now(),
         'time_correction' => 0,
     ], $char);
 };

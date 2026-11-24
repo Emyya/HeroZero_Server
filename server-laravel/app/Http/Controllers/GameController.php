@@ -51,7 +51,7 @@ class GameController extends Controller
             && !in_array($action, ['syncOpticalChanges', 'getGuildLog', 'gameReportError'], true)) {
             error_log("[herozero] action={$action} user=" . ($params['user_id'] ?? '?') .
                 ' params=' . json_encode(array_diff_key($params, array_flip(
-                    ['action', 'user_id', 'user_session_id', 'auth', 'client_version', 'build_number', 'rct', 'keep_active', 'device_id', 'device_type']
+                    ['action', 'user_id', 'user_session_id', 'auth', 'password', 'email', 'client_version', 'build_number', 'rct', 'keep_active', 'device_id', 'device_type']
                 ))));
         }
 
@@ -64,12 +64,23 @@ class GameController extends Controller
 
         try {
             Session::guard($action, $params);
+            $uid = (int)($params['user_id'] ?? 0);
+            if ($uid > 0) {
+                // TEM de ser GameTime::now(): todos os timestamps de jogo são
+                // gravados/comparados no relógio de jogo (epoch+uptime+offset).
+                // Com time() cru, qualquer uptime acumulado > threshold fazia
+                // todos os personagens aparecerem offline (verde nunca acendia).
+                \HeroZero\Db::exec(
+                    'UPDATE `character` SET ts_last_action = ? WHERE user_id = ? AND ts_last_action < ?',
+                    [\HeroZero\GameTime::now(), $uid, \HeroZero\GameTime::now() - 30]
+                );
+            }
             $data = Router::dispatch($action, $params);
             $body = GameResponse::ok($data);
         } catch (GameError $e) {
             $body = GameResponse::error($e->getMessage());
         } catch (\Throwable $e) {
-            error_log("[herozero] excecao em {$action}: " . $e->getMessage());
+            error_log("[herozero] excecao em {$action}: " . $e->getMessage() . " at " . $e->getFile() . ":" . $e->getLine() . "\n" . $e->getTraceAsString());
             $body = GameResponse::error('response_errorIO');
         }
         return $this->json($body, $request);
@@ -108,7 +119,7 @@ class GameController extends Controller
             'scripts' => [
                 $origin . '/js/jquery-3.3.1.min.js',
                 $origin . '/js/standalone.js?v=local-desktop-1',
-                $origin . '/js/HeroZero.min.js',
+                $origin . '/js/HeroZero.min.js?v=20261005-event-treasures-v1',
             ],
             'clientVars' => $clientVars,
             'urlCDN'     => $appCDNUrl,

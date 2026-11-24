@@ -1,0 +1,9 @@
+**
+!Dockerfile
+!Dockerfile.socket
+!containers/
+!containers/**
+!socket-server/
+!socket-server/package.json
+!socket-server/package-lock.json
+!socket-server/server.js

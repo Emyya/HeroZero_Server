@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 /**
  * action: getDuelOpponents
- * `character` do jogador vem do banco; `opponents` vem das linhas NPC (character user_id=0).
+ * `character` do jogador vem do banco; `opponents` sao as contas reais (user_id <> 0).
  */
 
 use HeroZero\Character;

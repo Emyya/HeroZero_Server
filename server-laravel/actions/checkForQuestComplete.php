@@ -23,6 +23,11 @@ return function (array $params): array {
             'id' => (int)$q['id'],
             'status' => (int)$q['status'],
             'fight_battle_id' => (int)$q['fight_battle_id'],
+            // `rewards` TEM de vir na resposta: ao PERDER uma missao de luta o
+            // servidor corta o premio para 10% (checkActiveQuestComplete). Sem
+            // este campo o cliente ficava com as recompensas antigas em memoria e
+            // mostrava o valor cheio, mesmo tendo perdido.
+            'rewards' => (string)$q['rewards'],
         ],
     ];
     $battle = $char->battleData((int)$q['fight_battle_id']);
@@ -32,5 +37,5 @@ return function (array $params): array {
     foreach (['server_time', 'time_correction'] as $k) {
         if (array_key_exists($k, $tpl)) $data[$k] = $tpl[$k];
     }
-    return $data;
+    return \HeroZero\DailyMilestones::attachAll($data, $char->id());
 };

@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+use HeroZero\GameTime;
+
 /**
  * action: joinGuild  (entrar em uma guilda existente que aceita membros)
  * Entrada: guild_id, invitation (bool)
@@ -37,7 +39,7 @@ return function (array $params): array {
         throw new GameError('errJoinGuildFull');
     }
 
-    $now = time();
+    $now = GameTime::now();
     Db::exec(
         'UPDATE `character` SET guild_id = ?, guild_rank = 3, ts_guild_joined = ?, ts_last_action = ? WHERE id = ?',
         [$guildId, $now, $now, $char->id()]
@@ -45,7 +47,7 @@ return function (array $params): array {
     Db::exec('DELETE FROM `guild_invites` WHERE guild_id = ? AND character_id = ?', [$guildId, $char->id()]);
     Db::exec(
         "INSERT INTO `guild_logs` (guild_id, character_id, character_name, type, value1, value2, value3, timestamp)
-         VALUES (?, ?, ?, 2, '', '', '', ?)",
+         VALUES (?, ?, ?, 1, '', '', '', ?)",
         [$guildId, $char->id(), $char->name(), $now]
     );
 

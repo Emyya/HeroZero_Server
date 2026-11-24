@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+use HeroZero\GameTime;
+
 use HeroZero\Character;
 use HeroZero\Db;
 use HeroZero\Live;
@@ -23,7 +25,7 @@ return function (array $params): array {
             }
             if ($targetId > 0 && $targetId !== $cid) {
                 Db::exec('INSERT IGNORE INTO `message_ignored_characters` (character_id, ignored_character_id, ts_creation) VALUES (?, ?, ?)',
-                    [$cid, $targetId, time()]);
+                    [$cid, $targetId, GameTime::now()]);
             }
             break;
         }
@@ -53,7 +55,7 @@ return function (array $params): array {
             $to = (string)($params['character_id'] ?? $params['stream_id'] ?? '');
             if ($message !== '') {
                 Db::exec("INSERT INTO `messages` (character_from_id, character_to_ids, subject, message, flag, flag_value, ts_creation, readed)
-                          VALUES (?, ?, '', ?, 0, 0, ?, 0)", [$cid, $to, $message, time()]);
+                          VALUES (?, ?, '', ?, 0, 0, ?, 0)", [$cid, $to, $message, GameTime::now()]);
             }
             break;
         }

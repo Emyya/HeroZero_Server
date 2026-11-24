@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+use HeroZero\GameTime;
+
 use HeroZero\Character;
 use HeroZero\Db;
 use HeroZero\GameError;
@@ -68,7 +70,7 @@ return function (array $params): array {
             if ($targetId <= 0) break;
             $exists = (int)Db::value('SELECT COUNT(*) FROM `guild_invites` WHERE guild_id = ? AND character_id = ?', [$guildId, $targetId]);
             if ($exists === 0) {
-                Db::exec('INSERT INTO `guild_invites` (character_id, guild_id, ts_creation) VALUES (?, ?, ?)', [$targetId, $guildId, time()]);
+                Db::exec('INSERT INTO `guild_invites` (character_id, guild_id, ts_creation) VALUES (?, ?, ?)', [$targetId, $guildId, GameTime::now()]);
             }
             break;
         }
@@ -88,10 +90,10 @@ return function (array $params): array {
             if ($guild === null || !(bool)$guild['accept_members']) break;
             $memberCount = (int)Db::value('SELECT COUNT(*) FROM `character` WHERE guild_id = ?', [$applyGuild]);
             if ($memberCount >= (int)$guild['stat_guild_capacity']) break;
-            $now = time();
+            $now = GameTime::now();
             Db::exec('UPDATE `character` SET guild_id = ?, guild_rank = 3, ts_guild_joined = ?, ts_last_action = ? WHERE id = ?', [$applyGuild, $now, $now, $cid]);
             Db::exec("INSERT INTO `guild_logs` (guild_id, character_id, character_name, type, value1, value2, value3, timestamp)
-                      VALUES (?, ?, ?, 2, '', '', '', ?)", [$applyGuild, $cid, $char->name(), $now]);
+                      VALUES (?, ?, ?, 1, '', '', '', ?)", [$applyGuild, $cid, $char->name(), $now]);
             break;
         }
 
@@ -206,7 +208,7 @@ return function (array $params): array {
             $ids = array_map(static fn(array $r): int => (int)$r['id'],
                 Db::rows('SELECT id FROM `character` WHERE guild_id = ?', [$guildId]));
             Db::exec('INSERT INTO `messages` (character_from_id, character_to_ids, subject, message, flag, flag_value, ts_creation, readed)
-                      VALUES (?, ?, ?, ?, 0, 0, ?, 0)', [$cid, implode(',', $ids), $subject, $message, time()]);
+                      VALUES (?, ?, ?, ?, 0, 0, ?, 0)', [$cid, implode(',', $ids), $subject, $message, GameTime::now()]);
             break;
         }
 

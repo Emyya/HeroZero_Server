@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+use HeroZero\GameTime;
+
 /**
  * action: registerUserSSO  (registro de conta convidado/SSO, tela inicial do jogo)
  * Entrada: platform, platform_user_id, registration_source, device_info(json), app_version
@@ -49,7 +51,7 @@ return function (array $params): array {
 
     return [
         'user' => $user,
-        'server_time' => time(),
+        'server_time' => GameTime::now(),
         'time_correction' => 0,
     ];
 };

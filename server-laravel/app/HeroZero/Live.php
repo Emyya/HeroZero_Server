@@ -47,6 +47,43 @@ final class Live
         // [[booster-catalog-null-crash]]). Espelhamos o catalogo inteiro tambem em
         // guild_boosters pra qualquer id que emitirmos resolver nos dois lugares.
         $data['constants']['guild_boosters'] = $boosters;
+        // Atribuicao direta (e não +=): os templates trazem estas chaves a null
+        // e += nao sobrescreve chaves existentes.
+        $data['constants']['tournament_rewards'] = Tournament::CLIENT_TOURNAMENT_REWARDS;
+        $data['constants']['global_tournament_rewards'] = Tournament::CLIENT_GLOBAL_TOURNAMENT_REWARDS;
+        // LIGAS: constantes oficiais + tabela league_divisions (13 divisoes) direto do
+        // constants_json.data — os templates trazem league_divisions a null e NENHUMA
+        // chave league_*, o que deixava o limite diario a 0, divisoes "unknown" e o
+        // preview ELO quebrado. Mesmo padrao dos tournament_rewards acima.
+        foreach (League::officialConstants() as $k => $v) {
+            if ($v !== null && !array_key_exists($k, $data['constants'])) {
+                $data['constants'][$k] = $v;
+            }
+        }
+        if (!array_key_exists('league_divisions', $data['constants'])) {
+            $data['constants']['league_divisions'] = League::divisions();
+        }
+        // SIDEKICKS: escalares sidekick_* + secoes sidekick_levels/sidekick_skills/
+        // sidekick_data/battle_effects direto do constants_json.data — os templates
+        // trazem as secoes a null e NENHUM escalar, e o cliente crasha
+        // ("Trying to retrieve unknown constant!") ao abrir qualquer UI de
+        // sidekicks. Atribuicao direta (mesmo padrao dos tournament_rewards).
+        Sidekick::injectConstants($data['constants']);
+        foreach (Herobook::constants() as $key => $value) $data['constants'][$key] = $value;
+        foreach (HeroCon::constants() as $key => $value) $data['constants'][$key] = $value;
+        // Valores do CDN (50/recarga, 200/dia) são os correctos — não sobrepor.
+        // SEASON PASS: constante mínima para gj.exists(identifier) retornar true
+        // e o botão da season ser renderizado. O cliente usa o identifier do
+        // season_progress para fazer lookup aqui -- sem esta entrada o botão
+        // nunca aparece independentemente do estado do progresso.
+        if (!array_key_exists('seasons', $data['constants']) || $data['constants']['seasons'] === null) {
+            $data['constants']['seasons'] = Season::constantsData();
+        }
+        $data['constants'] = array_replace($data['constants'], Casino::constants());
+        // Remover constants null para não sobrescrever dados do CDN
+        foreach ($data['constants'] as $k => $v) {
+            if ($v === null) unset($data['constants'][$k]);
+        }
         return $data;
     }
 
@@ -125,9 +162,42 @@ final class Live
 
     public static function timeKeys(array $data): array
     {
-        $data['server_time'] = time();
+        $data = array_replace($data, Tournament::calendarTimestamps());
+        $data['server_time'] = GameTime::now();
         $data['time_correction'] = 0;
         return $data;
+    }
+
+    /**
+     * Fuso do RELÓGIO DE JOGO (slots de batalha de guilda, limites diarios,
+     * etc.). O cliente constroi a hora do servidor como
+     *   utcLocalTimestampOffset + server_timestamp_offset + timestampCorrection
+     * e formata "hoje/amanha/HH:MM" no fuso do BROWSER -- com o valor capturado
+     * do oficial (-10800 = UTC-3, Brasil) tudo ficava desfasado 4h para
+     * utilizadores em Portugal: os slots marcavam para o dia errado e mostravam
+     * hora diferente da escolhida. Com S = offset de Lisboa, utcLocal(-3600 em
+     * WEST) + S(+3600) = 0 -> a hora do servidor coincide com a hora de Lisboa.
+     */
+    public static function gameTimezone(): \DateTimeZone
+    {
+        return new \DateTimeZone((string)(getenv('HZ_GAME_TZ') ?: 'Europe/Lisbon'));
+    }
+
+    /** Agora no relógio de jogo (baseado no uptime do servidor). */
+    public static function gameNow(): \DateTimeImmutable
+    {
+        return (new \DateTimeImmutable('@' . GameTime::now()))
+            ->setTimezone(self::gameTimezone());
+    }
+
+    /**
+     * Valor a enviar ao cliente em `server_timestamp_offset`: o offset (em
+     * segundos) do fuso de jogo. O cliente soma-o ao utcLocalTimestampOffset
+     * (que em UTC+1 vale -3600), logo o par tem de anular-se.
+     */
+    public static function gameTimestampOffset(): int
+    {
+        return (int)(self::gameNow()->getOffset());
     }
 
     public static function overlayAccount(array $data, int $userId): array
@@ -149,17 +219,20 @@ final class Live
         if (isset($data['items']) && is_array($data['items'])) {
             $data['items'] = $char->itemsData($data['items'][0] ?? []);
         }
+        $data['item_improvements'] = ItemImprovement::data($char->id());
         if (isset($data['quests']) && is_array($data['quests'])) {
             $data['quests'] = $char->questsData($data['quests'][0] ?? []);
         }
+        $singularQuestId = (int)($data['_training_singular_quest_id'] ?? 0);
+        unset($data['_training_singular_quest_id']);
         if (isset($data['trainings']) && is_array($data['trainings'])) {
-            $data = self::attachTrainingState($data, $char);
+            $data = self::attachTrainingState($data, $char, $singularQuestId);
         } elseif (array_key_exists('training_quests', $data)) {
             // template com training_quests de outra conta sem trainings: ids
             // estranhos no mapa do cliente (ou merge em get_training() null).
             unset($data['training_quests']);
         }
-        return $data;
+        return DailyMilestones::attachAll(UserVouchers::attach($data, $char->id()), $char->id());
     }
 
     /**
@@ -173,10 +246,50 @@ final class Live
      * `training_quests` sem treino ativo crasha o merge (get_training() null),
      * por isso a chave e removida quando nao ha treino.
      */
-    public static function attachTrainingState(array $data, Character $char): array
+    public static function attachTrainingState(array $data, Character $char, int $singularQuestId = 0, bool $forcePlural = false): array
     {
-        $tpl = $data['trainings'][0] ?? (Replay::data('autoLoginUser')['trainings'][0] ?? []);
-        $data['trainings'] = $char->trainingsData(is_array($tpl) ? $tpl : []);
+        $tpl  = $data['trainings'][0] ?? (Replay::data('autoLoginUser')['trainings'][0] ?? []);
+        $rows = $char->trainingsData(is_array($tpl) ? $tpl : []);
+
+        $active = null;
+        foreach ($rows as $row) {
+            if ((int)($row['status'] ?? 0) === 2) { $active = $row; break; }
+        }
+
+        // Com treino ATIVO responde-se com `training` (SINGULAR), como o servidor
+        // oficial faz em quase todas as actions (syncGame, getGuildLog, claim*, ...).
+        // No cliente:
+        //   refreshTrainings (plural)   -> this._trainings = new Ec  => APAGA os quests
+        //   refreshTraining  (singular) -> createOrUpdateMap(...)    => atualiza no sitio
+        // Mandar o plural em toda a resposta limpava a lista de quests a cada
+        // syncGame; o loop que liga o `training_battle` (procura fightBattleId nos
+        // trainingQuests) ficava sem nada, a batalha nunca era anexada e os labels
+        // do painel ficavam no texto por defeito do layout ("LOC"). Ver BUG-TR-012.
+        if (!$forcePlural && $active !== null) {
+            if ($singularQuestId > 0) {
+                // O cliente le training_quest_id em get_activeTrainingQuest().
+                $active['training_quest_id'] = $singularQuestId;
+            }
+            $data['training'] = $active;
+            unset($data['trainings']);
+
+            // Modo batalha: NUNCA reenviar os quests — refreshTrainingQuests cria
+            // objectos novos e quebra a referencia que o painel ja tem (BUG-TR-011).
+            if ($singularQuestId > 0) {
+                unset($data['training_quests']);
+                return $data;
+            }
+            $quests = $char->trainingQuestsData();
+            if ($quests !== []) {
+                $data['training_quests'] = $quests;
+            } else {
+                unset($data['training_quests']);
+            }
+            return $data;
+        }
+
+        // Plural: boot (o mapa do cliente esta vazio) e refresh do pool de ofertas.
+        $data['trainings'] = $rows;
         $quests = $char->trainingQuestsData();
         if ($quests !== []) {
             $data['training_quests'] = $quests;
@@ -186,71 +299,17 @@ final class Live
         return $data;
     }
 
-    /**
-     * `event_quest`: o convite vem do template SEM `id` (o cliente usa
-     * !hasData("id") como get_isUnassigned). Quando a conta ja aceitou
-     * (character.event_quest_id != 0), o objeto PRECISA carregar esse id na
-     * MESMA resposta: get_eventQuest() localiza a quest por get_id(), e
-     * DataObject sem o campo lanca "unknown field key=id" no painel de quests.
-     * Chamar DEPOIS de overlayCharacter (le event_quest_id ja resolvido).
-     */
+    /** Substitui o evento da fixture por convite/progresso real da conta. */
     public static function attachEventQuestState(array $data): array
     {
-        $tpl = $data['event_quest'] ?? (self::template('autoLoginUser')['event_quest'] ?? null);
-        if (!is_array($tpl)) {
-            return $data;
-        }
-        $eqId = (int)($data['character']['event_quest_id'] ?? 0);
-        if ($eqId !== 0) {
-            // Shape ASSIGNED completa do DOEventQuest (Gr): o painel le status
-            // (get_isFinished = status==2) e campos de reward SEM guarda de
-            // hasData; qualquer um ausente derruba o painel de quests.
-            $tpl += [
-                'id' => $eqId,
-                'status' => 1,
-                'rewards' => '',
-                'reward_item1_id' => 0,
-                'reward_item1_rewards' => '',
-                'reward_item2_id' => 0,
-                'reward_item2_rewards' => '',
-                'reward_item3_id' => 0,
-                'reward_item3_rewards' => '',
-            ];
-            $tpl['id'] = $eqId;
-        }
-        $data['event_quest'] = $tpl;
-        return $data;
+        $cid=(int)($data['character']['id'] ?? 0);
+        return $cid>0 ? EventQuests::attach($data,$cid) : $data;
     }
 
-    /**
-     * `treasure_event`: mesmo contrato do [[event_quest]] — o convite do template
-     * NAO tem `id` (get_isUnassigned = !hasData("id")); quando a conta aceitou
-     * (character.treasure_event_id != 0, recomputado no overlay a partir do blob
-     * em collected_item_pattern), o objeto precisa da shape ASSIGNED completa do
-     * DOEventTreasure (Lq) — todos os campos lidos sem guarda de hasData.
-     */
+    /** Convite global/progresso real da Caça às Toupeiras; exclui fixtures antigas. */
     public static function attachTreasureEventState(array $data, Character $char): array
     {
-        $tpl = $data['treasure_event'] ?? (self::template('autoLoginUser')['treasure_event'] ?? null);
-        if (!is_array($tpl)) {
-            return $data;
-        }
-        if ((int)($data['character']['treasure_event_id'] ?? 0) !== 0) {
-            $state = $char->ensureTreasureEventState();
-            $tpl += [
-                'id' => 1,
-                'status' => 1,
-                'event_tokens' => (int)($state['tokens'] ?? 0),
-                'current_level' => (int)($state['level'] ?? 1),
-                'event_reveal_items' => 0,
-                'ts_reveal_item_collected' => 0,
-                'rewards' => '',
-                'collected_rewards' => '',
-                'levels' => '',
-            ];
-        }
-        $data['treasure_event'] = $tpl;
-        return $data;
+        return TowerEvents::attach(EventTreasures::attach($data, $char->id()), $char->id());
     }
 
     /**
@@ -261,9 +320,10 @@ final class Live
      */
     public static function attachStoryDungeonState(array $data, Character $char): array
     {
-        $state = $char->storyDungeonState();
+        $state = StoryDungeon::ensure($char->id());
         $data['completed_story_dungeon_steps'] = array_values($state['completed']);
         $active = $state['active'] ?? null;
+        if (isset($data['character'])) $data['character']['active_story_dungeon_attack_id'] = (int)($active['battle_id'] ?? 0);
         if (is_array($active)) {
             $index = (int)$active['index'];
             $step = (int)$active['step'];
@@ -280,12 +340,31 @@ final class Live
                 'step_index' => $step,
                 'status' => (int)$active['status'],
                 'repeat' => false,
-                'points_collected' => 0,
-                'ts_complete' => 0,
-                'ts_last_attack' => 0,
-                'battle_ids' => '',
-                'rewards' => '',
+                'points_collected' => (int)($active['points'] ?? 0),
+                'ts_complete' => (int)($active['ts_complete'] ?? 0),
+                'ts_last_attack' => (int)($active['ts_last_attack'] ?? 0),
+                'battle_ids' => empty($active['battle_ids']) ? '' : json_encode($active['battle_ids']),
+                'rewards' => json_encode($active['rewards'] ?? []),
             ];
+            $boot = self::template('autoLoginUser');
+            // O cliente resolve reward.item antes de desenhar o diálogo, inclusive no login.
+            $itemId = (int)($active['rewards']['item'] ?? 0);
+            if ($itemId > 0 && !in_array($itemId, array_map('intval', array_column($data['items'] ?? [], 'id')), true)) {
+                $item = Db::row('SELECT * FROM items WHERE id = ? AND character_id = ?', [$itemId, $char->id()]);
+                if ($item) $data['items'][] = self::shapeLike($boot['items'][0] ?? [], $item);
+            }
+            $battleId = (int)($active['battle_id'] ?? 0);
+            if ($battleId > 0) {
+                $battle = Db::row('SELECT * FROM battle WHERE id = ?', [$battleId]);
+                if ($battle) {
+                    // Coleção no login e objeto singular nas ações; fundir sem apagar outras lutas.
+                    $battle = self::shapeLike($boot['battle'] ?? [], $battle);
+                    if (empty($data['battle']['id'])) $data['battle'] = $battle;
+                    $data['battles'] = array_values(array_filter($data['battles'] ?? [],
+                        static fn(array $row): bool => (int)$row['id'] !== $battleId));
+                    $data['battles'][] = $battle;
+                }
+            }
         }
         return $data;
     }
@@ -297,31 +376,91 @@ final class Live
 
     public static function accountState(int $userId, array $data = []): array
     {
+        $data = array_replace($data, Tournament::timestamps());
         $char = Character::loadByUser($userId);
         $boot = self::template('autoLoginUser');
 
+        // Resolucao de batalhas de guilda fora de hora TEM de correr ANTES dos
+        // overlays: simula a luta (modelo oficial lazy) e grava o apontador
+        // finished_guild_dungeon_battle_id no personagem — se corresse depois,
+        // o bloco `character` saia com o valor velho (objeto ja carregado).
+        $preGuildId = (int)Db::value('SELECT guild_id FROM `character` WHERE id = ?', [$char->id()]);
+        if ($preGuildId > 0 && GuildBattles::resolveDueDungeonBattle($preGuildId)) {
+            $char = Character::load($char->id());
+        }
+
+        // ADRENALINA de liga: sincronizacao LAZY em toda resposta (mesmo chokepoint
+        // do ensureSeason la em baixo). O cliente le o maximo da barra direto do
+        // campo character.max_league_stamina (ep.get_maxLeagueStamina) — sem isto,
+        // comprar um energetico devolvia o maximo VELHO (20) e a barra so mudava
+        // quando comecasse uma luta de liga.
+        $leagueRow = Db::row(
+            'SELECT id, guild_id, league_stamina, max_league_stamina, ts_last_league_stamina_change,
+                    active_league_booster_id, ts_active_league_boost_expires,
+                    league_fight_count, ts_last_league_fight
+               FROM `character` WHERE id = ?',
+            [$char->id()]
+        );
+        // Contador diario NA MESMA passagem: o cliente NAO olha datas para este
+        // limite (bundle: get_leagueFightCountLeftToday = maxDaily - leagueFightCount;
+        // ao contrario de washItem/shopRefresh, que usam isToday(ts)). Ecoar o
+        // contador de ONTEM deixava o botao de ataque da liga desativado com
+        // "atingiu o numero maximo" mesmo depois de virar o dia.
+        if ($leagueRow !== null
+            && League::syncDailyCount(League::syncStamina($leagueRow)) !== $leagueRow) {
+            $char = Character::load($char->id()); // sync gravou em BD — reler para os overlays
+        }
+
+        $char->syncDailyReset();
+        Casino::syncDaily($char->id());
         $data['user'] = $char->overlayUser($data['user'] ?? $boot['user'] ?? []);
         $data['character'] = $char->overlayCharacter($data['character'] ?? $boot['character'] ?? []);
+        // SEASON PASS: progresso em toda resposta (cliente valida active_season_progress_id em
+        // cada updateData para invalidar o cache de seasonProgress se o id não bater).
+        $seasonProgress = Season::progressForCharacter($char->id());
+        $data['season_progress'] = $seasonProgress;
+        $data['season_rewards'] = Season::rewardsForCharacter($char->id());
+        $data['herobook_objectives'] = Herobook::data($char->id());
+        $data = UserVouchers::attach($data, $char->id());
+        $data['character']['active_season_progress_id'] = $seasonProgress['id'];
+        $data['bank_inventory'] = BankInventory::data($char->id());
         $data['inventory'] = $char->inventoryData($data['inventory'] ?? $boot['inventory'] ?? []);
         $data['items'] = $char->itemsData(($data['items'][0] ?? null) ?: ($boot['items'][0] ?? []));
+        $data['item_improvements'] = ItemImprovement::data($char->id());
         $data['quests'] = $char->questsData(($data['quests'][0] ?? null) ?: ($boot['quests'][0] ?? []));
         $data['trainings'] = [($data['trainings'][0] ?? null) ?: ($boot['trainings'][0] ?? [])];
+        // SIDEKICKS: lista do personagem em toda resposta (o cliente funde por id
+        // via refreshSidekicks; sem a chave o painel nasce vazio no primeiro boot).
+        $data['sidekicks'] = Sidekick::ownedByCharacter($char->id());
+        // SIDEKICK GOALS: unicos contadores vivos do painel de metas. Parcial de
+        // proposito — o cliente faz merge por chave em refreshGoalValues().
+        $data['current_goal_values'] = Sidekick::goalValues($char->id());
         // O client so chama refreshNews() (que instancia character._news) quando a
         // resposta tem hasData("news"); sem isso _news fica null pra sempre e
         // qualquer refreshTitleBar (get_news().get_hasUnreadNews()) crasha.
         $data['news'] = $data['news'] ?? $boot['news'] ?? [];
-        $data = self::attachTrainingState($data, $char);
+        $singularQuestId = (int)($data['_training_singular_quest_id'] ?? 0);
+        unset($data['_training_singular_quest_id']);
+        $data = self::attachTrainingState($data, $char, $singularQuestId);
         $data = self::attachEventQuestState($data);
         $data = self::attachTreasureEventState($data, $char);
         $data = self::attachStoryDungeonState($data, $char);
+        $data = \HeroZero\Worldboss::attach($data, $char->id());
+        // HIDEOUT: estado completo em toda resposta (o cliente funde por campo;
+        // sem hideout vai so missed_hideout_attacks=0, como no boot oficial).
+        $data = Hideout::attachState($data, $char->id());
 
         $guild = self::guildForUser($userId);
         if ($guild !== null) {
+            $gid = (int)$guild['id'];
+
             $data['guild'] = self::shapeGuild($guild);
-            $data['guild_members'] = self::guildMembers((int)$guild['id']);
+            $data['guild_members'] = self::guildMembers($gid);
             // Quando a versao muda, o cliente dispara getGuildLog no proximo poll
             // (e assim o chat chega aos outros membros).
             $data['sync_states'] = ['guild' . (int)$guild['id'] => GuildChat::version((int)$guild['id'])];
+
+            $data = self::attachGuildBattleState($data, $guild, $char);
         }
 
         $optical = Character::emptyLike($boot['current_optical_changes'] ?? []);
@@ -336,9 +475,71 @@ final class Live
         $optical['use_for_league'] = false;
         $data['current_optical_changes'] = $optical;
 
-        $data['server_time'] = time();
+        // Duelo em curso: o cliente precisa de `duel` + `battle` + `opponent` para
+        // retomar o painel de batalha depois de um sync/reload. get_activeDuel()
+        // compara _duel.get_id() com character.active_duel_id -- sem o bloco `duel`
+        // o _duel fica null, o duelo "some" e o dialogo de recompensa nunca abre.
+        // `battles[]` NUNCA pode acompanhar: o cliente prefere
+        // getBattleFromId(battles, battle_id) e devolve null (o id nao existe no
+        // array do template) -> refreshBattle(null) -> get_profileB() undefined.
+        // Duelos/lutas de liga PENDENTES no lado do defensor ("missed duels"): o
+        // cliente so mostra a bolha/notificacao e o painel de duelos perdidos se
+        // estes contadores forem > 0. Sem eles as character_b_rewards nunca eram
+        // reclamadas (claimMissedDuelsRewards) e a honra do defensor ficava
+        // congelada -- ganhava/perdia sem mexer.
+        foreach (self::missedCounters($char->id()) as $k => $v) {
+            $data[$k] = $v;
+        }
+
+        $activeDuelId = (int)($data['character']['active_duel_id'] ?? 0);
+        if ($activeDuelId > 0) {
+            $duelRow = Db::row('SELECT * FROM `duel` WHERE id = ? AND character_a_id = ?', [$activeDuelId, $char->id()]);
+            if ($duelRow !== null) {
+                $data['duel'] = self::shapeLike($boot['duel'] ?? [], $duelRow);
+                $battleRow = Db::row('SELECT * FROM `battle` WHERE id = ?', [(int)$duelRow['battle_id']]);
+                if ($battleRow !== null) {
+                    $data['battle'] = self::shapeLike($boot['battle'] ?? [], $battleRow);
+                }
+                $data['opponent'] = self::requestedCharacter((int)$duelRow['character_b_id'], $boot['opponent'] ?? []);
+                unset($data['battles']);
+            }
+        }
+
+        // EPOCA da liga: o template traz o timestamp FIXO da captura oficial (data
+        // passada). Servimos o fim da epoca real (proxima segunda-feira no relogio
+        // de jogo) e rodamos a epoca aqui se ja expirou — o accountState e o choke
+        // point de praticamente todas as respostas, logo o rolamento corre no
+        // primeiro acesso apos o fim de semana sem precisar de cron.
+        if (array_key_exists('league_season_end_timestamp', $boot)) {
+            $data['league_season_end_timestamp'] = League::ensureSeason();
+            $data['league_locked'] = false;
+        }
+
+        $data['server_time'] = GameTime::now();
         $data['time_correction'] = 0;
-        return $data;
+        $data['bonus_info'] = BonusEvents::payload();
+        $data = EventTreasures::attach(EventQuests::attach(DailyMilestones::attachAll(Casino::attach(DailyLogin::attach($data, $char->id()), $char->id()), $char->id()), $char->id()), $char->id());
+        return TowerEvents::attach(HeroCon::attach(EventDraws::attach($data, $char->id()), $char->id()), $char->id());
+    }
+
+    /**
+     * Contadores de duelos/lutas de liga perdidas pendentes do DEFENSOR
+     * (character_b_status IN (1,2)). Usados no accountState e no boot.
+     *
+     * @return array{missed_duels:int, missed_league_fights:int}
+     */
+    public static function missedCounters(int $characterId): array
+    {
+        return [
+            'missed_duels' => (int)Db::value(
+                'SELECT COUNT(*) FROM `duel` WHERE character_b_id = ? AND character_b_status IN (1,2)',
+                [$characterId]
+            ),
+            'missed_league_fights' => (int)Db::value(
+                'SELECT COUNT(*) FROM `league_fight` WHERE character_b_id = ? AND character_b_status IN (1,2)',
+                [$characterId]
+            ),
+        ];
     }
 
     public static function guildForUser(int $userId): ?array
@@ -405,6 +606,31 @@ final class Live
         // total ganho = honor / HONOR_PER_STAT_POINT; disponível = total - já gastos.
         // Sem isto, toda guilda ficava travada em 0 (improveGuildStat sempre falhava).
         $guild['stat_points_available'] = self::guildStatPointsAvailable($guild);
+
+        // Contadores de batalha calculados AO VIVO a partir das batalhas resolvidas:
+        // as colunas da tabela `guild` nunca são incrementadas e as ESTATÍSTICAS da
+        // team (DialogGuildStatistics: battles_attacked/defended/won/lost,
+        // dungeon_battles_fought/won) ficavam todas a 0, apesar do historico
+        // (getGuildBattleHistoryFights) mostrar as lutas. Mesmo critério de "won"
+        // do historico: dungeon paga moedas.
+        $gid = (int)$guild['id'];
+        $attacked = (int)Db::value('SELECT COUNT(*) FROM `guild_battle` WHERE status = 3 AND guild_attacker_id = ?', [$gid]);
+        $defended = (int)Db::value('SELECT COUNT(*) FROM `guild_battle` WHERE status = 3 AND guild_defender_id = ?', [$gid]);
+        $won      = (int)Db::value('SELECT COUNT(*) FROM `guild_battle` WHERE status = 3 AND guild_winner_id = ?', [$gid]);
+        $dungeonFought = (int)Db::value('SELECT COUNT(*) FROM `guild_dungeon_battle` WHERE status = 3 AND guild_id = ?', [$gid]);
+        $dungeonWon    = (int)Db::value("SELECT COUNT(*) FROM `guild_dungeon_battle` WHERE status = 3 AND guild_id = ? AND JSON_VALID(rewards) AND JSON_EXTRACT(rewards, '$.game_currency') > 0", [$gid]);
+        $guild['battles_attacked']  = $attacked;
+        $guild['battles_defended']  = $defended;
+        $guild['battles_fought']    = $attacked + $defended;
+        $guild['battles_won']       = $won;
+        $guild['battles_lost']      = ($attacked + $defended) - $won;
+        $guild['dungeon_battles_fought'] = $dungeonFought;
+        $guild['dungeon_battles_won']    = $dungeonWon;
+        // Trofeus: current/max ao vivo (mesma filosofia dos contadores acima) —
+        // max = slots desbloqueados pela expansao, para o dialogo "atuais/max".
+        // won/lost ficam das colunas, mantidas por GuildArtifacts nas transferencias.
+        $guild['artifacts_owned_current'] = count(\HeroZero\GuildArtifacts::ownedIds($guild));
+        $guild['artifacts_owned_max']     = \HeroZero\GuildArtifacts::unlockedSlots($guild);
         return $guild;
     }
 
@@ -444,6 +670,7 @@ final class Live
 
     public static function guildMembers(int $guildId): array
     {
+        $heroconCycle = HeroCon::sync();
         $rows = Db::rows(
             'SELECT id, user_id, name, gender, level, guild_rank, ts_guild_joined,
                     ts_last_action, guild_donated_game_currency, guild_donated_premium_currency,
@@ -458,6 +685,13 @@ final class Live
         );
         $members = [];
         foreach ($rows as $row) {
+            // Totais de atributos REAIS (base + treino + equipamento + bonus de
+            // booster/guilda), os mesmos que o perfil mostra. Antes era so
+            // base+treino e as MEDIAS de habs nas estatisticas da team (que o
+            // cliente calcula somando estes campos e dividindo pelos membros,
+            // Va.get_averageStrength etc.) ficavam muito abaixo do real.
+            $profile = Character::load((int)$row['id'])->battleProfile('a');
+            $herocon = $heroconCycle ? HeroCon::contribution((int)$heroconCycle['id'], (int)$row['id'], $guildId) : ['score'=>0,'fraction'=>0];
             $members[] = [
                 'id' => (int)$row['id'],
                 'user_id' => (int)$row['user_id'],
@@ -468,16 +702,16 @@ final class Live
                 'guild_rank' => (int)$row['guild_rank'],
                 'ts_guild_joined' => (int)$row['ts_guild_joined'],
                 'ts_last_online' => (int)$row['ts_last_action'],
-                'last_action' => (int)$row['ts_last_action'],
-                'online_status' => 2,
+                'last_action' => (int)floor((GameTime::now() - (int)$row['ts_last_action']) / 60),
+                'online_status' => (GameTime::now() - (int)$row['ts_last_action']) < 300 ? 1 : 2,
                 'game_currency_donation' => (int)$row['guild_donated_game_currency'],
                 'premium_currency_donation' => (int)$row['guild_donated_premium_currency'],
-                'guild_competition_points_gathered' => 0,
-                'guild_competition_point_fractions_gathered' => 0,
-                'stat_total_stamina' => (int)$row['stat_base_stamina'] + (int)$row['stat_trained_stamina'],
-                'stat_total_strength' => (int)$row['stat_base_strength'] + (int)$row['stat_trained_strength'],
-                'stat_total_critical_rating' => (int)$row['stat_base_critical_rating'] + (int)$row['stat_trained_critical_rating'],
-                'stat_total_dodge_rating' => (int)$row['stat_base_dodge_rating'] + (int)$row['stat_trained_dodge_rating'],
+                'guild_competition_points_gathered' => $herocon['score'],
+                'guild_competition_point_fractions_gathered' => $herocon['fraction'],
+                'stat_total_stamina' => (int)$profile['stamina'],
+                'stat_total_strength' => (int)$profile['strength'],
+                'stat_total_critical_rating' => (int)$profile['criticalrating'],
+                'stat_total_dodge_rating' => (int)$profile['dodgerating'],
                 'auto_joins' => 0,
                 'use_auto_joins_attack' => true,
                 'use_auto_joins_defense' => true,
@@ -500,14 +734,26 @@ final class Live
         return $members;
     }
 
-    public static function leaderboardCharacters(array $tpl, string $sort = 'honor', int $limit = 30): array
+    public static function leaderboardCharacters(array $tpl, string $sort = 'honor', int $limit = 0): array
     {
         $sortSql = match ($sort) {
-            'level' => '`level` DESC, `xp` DESC',
-            'league' => '`league_points` DESC, `honor` DESC',
-            default => '`honor` DESC, `level` DESC',
+            'level' => 'c.`level` DESC, c.`xp` DESC',
+            'league' => 'c.`league_points` DESC, c.`honor` DESC',
+            default => 'c.`honor` DESC, c.`level` DESC',
         };
-        $rows = Db::rows("SELECT * FROM `character` WHERE user_id <> 0 ORDER BY {$sortSql}, id LIMIT " . (int)$limit);
+        if ($limit <= 0) {
+            $limit = (int)(Db::value("SELECT COUNT(*) FROM `character` WHERE user_id <> 0 AND name <> ''") ?? 0);
+        }
+        $rows = Db::rows(
+            "SELECT c.*, COALESCE(g.`name`, '') AS leaderboard_guild_name,
+                    g.`emblem_background_shape`, g.`emblem_background_color`,
+                    g.`emblem_background_border_color`, g.`emblem_icon_shape`,
+                    g.`emblem_icon_color`, g.`emblem_icon_size`
+               FROM `character` c
+               LEFT JOIN `guild` g ON g.`id` = c.`guild_id` AND g.`status` = 1
+              WHERE c.`user_id` <> 0 AND c.`name` <> ''
+              ORDER BY {$sortSql}, c.`id` LIMIT " . (int)$limit
+        );
         $out = [];
         $rank = 1;
         foreach ($rows as $r) {
@@ -521,14 +767,24 @@ final class Live
                 'name' => (string)$r['name'],
                 'locale' => 'pt_BR',
                 'guild_id' => (int)$r['guild_id'],
-                'guild_name' => '',
+                'guild_name' => (string)$r['leaderboard_guild_name'],
+                'emblem_background_shape' => (int)($r['emblem_background_shape'] ?? 0),
+                'emblem_background_color' => (int)($r['emblem_background_color'] ?? 0),
+                'emblem_background_border_color' => (int)($r['emblem_background_border_color'] ?? 0),
+                'emblem_icon_shape' => (int)($r['emblem_icon_shape'] ?? 0),
+                'emblem_icon_color' => (int)($r['emblem_icon_color'] ?? 0),
+                'emblem_icon_size' => (int)($r['emblem_icon_size'] ?? 0),
                 'gender' => (string)$r['gender'],
                 'level' => (int)$r['level'],
                 'league_points' => (int)$r['league_points'],
                 'league_group_id' => (int)$r['league_group_id'],
                 'honor' => (int)$r['honor'],
                 'value' => $value,
-                'online_status' => 2,
+                // Verde de "online": mesmo criterio do guildMembers (ativo nos
+                // ultimos 5 min no RELOGIO DE JOGO). Hardcoded 2 = sempre offline.
+                'online_status' => (GameTime::now() - (int)($r['ts_last_action'] ?? 0)) < 300 ? 1 : 2,
+                'ts_last_online' => (int)($r['ts_last_action'] ?? 0),
+                'last_action' => (int)floor((GameTime::now() - (int)($r['ts_last_action'] ?? 0)) / 60),
                 'hideout_level' => 1,
                 'hideout_points' => 0,
                 'dungeon_hardmode_emblems' => 0,
@@ -542,21 +798,103 @@ final class Live
     }
 
     /**
-     * Sorteia 3 oponentes de liga (NPCs user_id=0), persiste a lista em
-     * character.league_opponents (+ ts do refresh) e devolve na shape que o client
-     * espera: { opponent, opponent_inventory, opponent_inventory_items }.
-     * Fonte unica usada por getLeagueOpponents/refreshLeagueOpponents/startLeagueFight
-     * (leagueMissed.php) e enterLeagueDivision.php — assim a lista salva no char e a
-     * ecoada na resposta nunca divergem.
+     * Sorteia 3 oponentes de liga entre contas REAIS, preferindo quem esta NA
+     * MESMA divisao e com nivel proximo (antes era RAND() global puro — alvos
+     * sem sentido). Persiste a lista em character.league_opponents (+ ts do
+     * refresh) e devolve a shape do cliente. Fonte unica usada pelo
+     * refreshLeagueOpponents/startLeagueFight/enterLeagueDivision — a lista
+     * salva no char e a ecoada na resposta nunca divergem.
      */
     public static function leagueOpponents(int $cid): array
     {
-        $rows = Db::rows('SELECT id FROM `character` WHERE user_id = 0 AND id <> ? ORDER BY RAND() LIMIT 3', [$cid]);
-        $ids = array_map(static fn(array $r): int => (int)$r['id'], $rows);
-        Db::exec('UPDATE `character` SET league_opponents = ?, ts_last_league_opponents_refresh = ? WHERE id = ?',
-            [implode(',', $ids), time(), $cid]);
-        // Template raso ([]) = opponent sem name/gender/level/league_points -> tela da
-        // liga com cards vazios e risco de crash (mesmo aviso do getCharacter.php).
+        $me = Db::row('SELECT level, league_group_id FROM `character` WHERE id = ?', [$cid]) ?? [];
+        $level = max(1, (int)($me['level'] ?? 1));
+        $group = (int)($me['league_group_id'] ?? 0);
+        $myDiv = League::divisionFromGroup($group);
+
+        $ids = [];
+        $exclude = [$cid];
+
+        $pickOne = static function (int $div) use (&$ids, &$exclude, $cid): bool {
+            $groupId = $div * League::GROUP_FACTOR + 1;
+            $row = Db::row(
+                'SELECT id FROM `character`
+                  WHERE user_id <> 0 AND id <> ? AND league_group_id = ?
+                    AND id NOT IN (' . implode(',', $exclude ?: [0]) . ')
+                  ORDER BY RAND() LIMIT 1',
+                [$cid, $groupId]
+            );
+            if ($row) {
+                $id = (int)$row['id'];
+                $ids[] = $id;
+                $exclude[] = $id;
+                return true;
+            }
+            return false;
+        };
+
+        // 3 oponentes: 90% mesma divisão, 10% divisão abaixo
+        for ($i = 0; $i < 3 && $myDiv > 0; $i++) {
+            $roll = mt_rand(1, 100);
+            if ($roll <= 90 || $myDiv <= 1) {
+                if (!$pickOne($myDiv) && $myDiv > 1) {
+                    $pickOne($myDiv - 1);
+                }
+            } else {
+                if (!$pickOne($myDiv - 1)) {
+                    $pickOne($myDiv);
+                }
+            }
+        }
+
+        $ids = array_slice($ids, 0, 3);
+
+        // So persiste a LISTA: ts_last_league_opponents_refresh e do botao manual
+        // (refreshLeagueOpponents) — rerolls automaticos (nova luta, entrada na
+        // liga) NAO podem queimar o refresh gratis diario.
+        // Formato JSON ARRAY ("[1,2,3]"), nao "1,2,3": get_leagueOpponentIds do
+        // cliente faz JSON.parse da coluna — string sem colchetes devolve lista
+        // vazia -> canDoLeagueFights=false -> painel fica em "nao inscrito" para
+        // sempre e o botao Ingressar "nao faz nada".
+        Db::exec('UPDATE `character` SET league_opponents = ? WHERE id = ?',
+            ['[' . implode(',', $ids) . ']', $cid]);
+        return self::renderLeagueOpponents($ids);
+    }
+
+    /**
+     * Ids da lista de oponentes PERSISTIDA (so os que ainda existem e nao sao o
+     * proprio). Formato na coluna: JSON ARRAY "[1,2,3]" (o cliente faz JSON.parse);
+     * aceita tambem o legado "1,2,3" por seguranca.
+     */
+    public static function savedLeagueOpponentIds(int $cid): array
+    {
+        $raw = (string)(Db::value('SELECT league_opponents FROM `character` WHERE id = ?', [$cid]) ?? '');
+        if ($raw === '') {
+            return [];
+        }
+        $decoded = json_decode($raw, true);
+        $parts = is_array($decoded) ? $decoded : explode(',', $raw);
+        $out = [];
+        foreach ($parts as $part) {
+            $id = (int)$part;
+            if ($id <= 0 || $id === $cid || in_array($id, $out, true)) {
+                continue;
+            }
+            $exists = (int)Db::value('SELECT COUNT(*) FROM `character` WHERE id = ? AND user_id <> 0', [$id]);
+            if ($exists === 1) {
+                $out[] = $id;
+            }
+        }
+        return $out;
+    }
+
+    /**
+     * Shape { opponent, opponent_inventory, opponent_inventory_items } dos ids
+     * dados. Template raso ([]) = opponent sem name/gender/level -> tela da liga
+     * com cards vazios e risco de crash (mesmo aviso do getCharacter.php).
+     */
+    public static function renderLeagueOpponents(array $ids): array
+    {
         $boot = self::template('autoLoginUser');
         $tplChar = $boot['character'] ?? [];
         $tplInv  = $boot['inventory'] ?? [];
@@ -564,9 +902,9 @@ final class Live
         $list = [];
         foreach ($ids as $oid) {
             $list[] = [
-                'opponent' => self::requestedCharacter($oid, $tplChar),
-                'opponent_inventory' => self::inventoryForCharacter($oid, $tplInv),
-                'opponent_inventory_items' => self::itemsForCharacter($oid, $tplItem),
+                'opponent' => self::requestedCharacter((int)$oid, $tplChar),
+                'opponent_inventory' => self::inventoryForCharacter((int)$oid, $tplInv),
+                'opponent_inventory_items' => self::itemsForCharacter((int)$oid, $tplItem),
             ];
         }
         return $list;
@@ -577,7 +915,7 @@ final class Live
         $char = Character::load($characterId);
         $data = $char->overlayCharacter($tplChar);
         $data['server_id'] = 'local';
-        $data['online_status'] = 2;
+        $data['online_status'] = (GameTime::now() - (int)($char->field('ts_last_action') ?? 0)) < 300 ? 1 : 2;
         return $data;
     }
 
@@ -610,5 +948,185 @@ final class Live
         if (is_int($like)) return (int)$val;
         if (is_float($like)) return (float)$val;
         return $val === null ? '' : (string)$val;
+    }
+
+    public static function attachGuildBattleState(array $data, array $guild, Character $char): array
+    {
+        $gid = (int)$guild['id'];
+
+        $pendingDungeonId = (int)($guild['pending_guild_dungeon_battle_attack_id'] ?? 0);
+        if ($pendingDungeonId > 0) {
+            $pb = Db::row('SELECT * FROM `guild_dungeon_battle` WHERE id=? AND guild_id=? AND status=2', [$pendingDungeonId, $gid]);
+            if ($pb !== null) {
+                $pSettings = json_decode((string)($pb['settings'] ?? '{}'), true) ?? [];
+                $data['pending_guild_dungeon_battle'] = [
+                    'id'                          => (int)$pb['id'],
+                    'battle_time'                 => (int)$pb['battle_time'],
+                    'ts_attack'                   => (int)$pb['ts_attack'],
+                    'guild_id'                    => $gid,
+                    'npc_team_identifier'         => (string)$pb['npc_team_identifier'],
+                    // STRING JSON: o cliente faz fromJsonString/JSON.parse sobre
+                    // este campo — array rebenta com SyntaxError no cliente.
+                    'npc_team_character_profiles' => GuildBattles::dungeonPreviewProfiles($pb),
+                    'status'                      => (int)$pb['status'],
+                    'settings'                    => json_encode($pSettings),
+                    // STRING JSON: o cliente faz fromJsonString/JSON.parse
+                    'character_ids'               => json_decode((string)($pb['character_ids'] ?? '[]'), true) ?? [],
+                ];
+            }
+        }
+
+        // --- guilda-vs-guilda: resolve as que chegaram à hora (lazy, como nas gangs)
+        GuildBattles::resolveDueGuildBattles();
+
+        $pendingAttackId = (int)($guild['pending_guild_battle_attack_id'] ?? 0);
+        if ($pendingAttackId > 0) {
+            $pb = Db::row('SELECT * FROM `guild_battle` WHERE id=? AND status=1', [$pendingAttackId]);
+            if ($pb !== null) {
+                $data['pending_guild_battle_attack'] = self::guildBattleShape($pb, true);
+                // O cliente resolve get_attacker()/get_defender() a partir desta
+                // lista — sem ela o jogo crasha no login
+                // ("get_pendingDefenseGuildBattle().get_attacker() is undefined").
+                $opp = Db::row('SELECT * FROM `guild` WHERE id = ?', [(int)$pb['guild_defender_id']]);
+                if ($opp !== null) {
+                    $data['guild_battle_guilds'][] = self::shapeGuild($opp);
+                }
+            }
+        }
+
+        $pendingDefenseId = (int)($guild['pending_guild_battle_defense_id'] ?? 0);
+        if ($pendingDefenseId > 0) {
+            $pb = Db::row('SELECT * FROM `guild_battle` WHERE id=? AND status=1', [$pendingDefenseId]);
+            if ($pb !== null) {
+                $data['pending_guild_battle_defense'] = self::guildBattleShape($pb, false);
+                $opp = Db::row('SELECT * FROM `guild` WHERE id = ?', [(int)$pb['guild_attacker_id']]);
+                if ($opp !== null) {
+                    $data['guild_battle_guilds'][] = self::shapeGuild($opp);
+                }
+            }
+        }
+
+        // Batalhas terminadas com recompensa por levantar:
+        // type 1 = membro do ATACANTE → finished_guild_battle_attack
+        // type 2 = membro do DEFENSOR → finished_guild_battle_defense
+        // A recompensa TEM de ser da MESMA batalha apontada em
+        // character.finished_guild_battle_*_id — o cliente so abre o diálogo
+        // se os ids coincidirem (senao fica em loop de sync sem mostrar nada).
+        foreach ([[1, 'finished_guild_battle_attack', 'finished_guild_battle_attack_id'], [2, 'finished_guild_battle_defense', 'finished_guild_battle_defense_id']] as [$rtype, $key, $charField]) {
+            $refId = (int)($char->field($charField) ?? 0);
+            if ($refId <= 0) continue;
+            $rw = Db::row(
+                'SELECT * FROM `guild_battle_rewards` WHERE character_id = ? AND type = ? AND guild_battle_id = ? AND status = 1 LIMIT 1',
+                [$char->id(), $rtype, $refId]
+            );
+            if ($rw === null) continue;
+            $fb = Db::row('SELECT * FROM `guild_battle` WHERE id = ? AND status = 3', [$refId]);
+            if ($fb === null) continue;
+            // Walkover: batalha sem rondas (nenhum defensor registado).
+            // Processa o prémio silenciosamente em vez de mostrar o diálogo de batalha.
+            if (($fb['rounds'] ?? '[]') === '[]') {
+                $coins = (int)$rw['game_currency'];
+                if ($coins > 0) {
+                    Db::exec('UPDATE `character` SET game_currency = game_currency + ? WHERE id = ?', [$coins, $char->id()]);
+                }
+                Db::exec('DELETE FROM `guild_battle_rewards` WHERE id = ?', [(int)$rw['id']]);
+                Db::exec("UPDATE `character` SET {$charField} = 0 WHERE id = ?", [$char->id()]);
+                continue;
+            }
+            $shape = self::guildBattleShape($fb, $rtype === 1);
+            $shape['rounds'] = (string)($fb['rounds'] ?? '');
+            $shape['attacker_character_profiles'] = \HeroZero\GuildBattles::clientProfiles((string)($fb['attacker_character_profiles'] ?? ''));
+            $shape['defender_character_profiles'] = \HeroZero\GuildBattles::clientProfiles((string)($fb['defender_character_profiles'] ?? ''));
+            $shape['guild_winner_id'] = (int)($fb['guild_winner_id'] ?? 0);
+            $shape['attacker_rewards'] = (string)($fb['attacker_rewards'] ?? '');
+            $shape['defender_rewards'] = (string)($fb['defender_rewards'] ?? '');
+            $data[$key] = $shape;
+            // Recompensas por levantar (DOGuildBattleReward: o cliente usa esta
+            // lista para o prémio individual do diálogo de resultado).
+            $data['guild_battle_rewards'] = [[
+                'id'              => (int)$rw['id'],
+                'guild_battle_id' => (int)$rw['guild_battle_id'],
+                'character_id'    => (int)$rw['character_id'],
+                'game_currency'   => (int)$rw['game_currency'],
+                'item_id'         => (int)$rw['item_id'],
+                'status'          => (int)$rw['status'],
+                'type'            => (int)$rw['type'],
+            ]];
+            // Guilda adversária para o cliente resolver nomes/emblemas.
+            $oppId = $rtype === 1 ? (int)$fb['guild_defender_id'] : (int)$fb['guild_attacker_id'];
+            $opp = Db::row('SELECT * FROM `guild` WHERE id = ?', [$oppId]);
+            if ($opp !== null) {
+                $data['guild_battle_guilds'][] = self::shapeGuild($opp);
+            }
+        }
+
+        $myReward = Db::row(
+            'SELECT * FROM `guild_battle_rewards` WHERE character_id = ? AND type = 3 AND status = 1 LIMIT 1',
+            [$char->id()]
+        );
+        if ($myReward !== null) {
+            $fb = Db::row('SELECT * FROM `guild_dungeon_battle` WHERE id = ?', [(int)$myReward['guild_battle_id']]);
+            if ($fb !== null) {
+                $data['finished_guild_dungeon_battle'] = [
+                    'id'                          => (int)$fb['id'],
+                    'guild_id'                    => (int)$fb['guild_id'],
+                    'battle_time'                 => (int)$fb['battle_time'],
+                    'ts_attack'                   => (int)$fb['ts_attack'],
+                    'npc_team_identifier'         => (string)$fb['npc_team_identifier'],
+                    'status'                      => (int)$fb['status'],
+                    'settings'                    => (string)$fb['settings'],
+                    'character_ids'               => (string)($fb['character_ids'] ?? '[]'),
+                    'joined_character_profiles'   => (string)($fb['joined_character_profiles'] ?? '[]'),
+                    'npc_team_character_profiles' => (string)($fb['npc_team_character_profiles'] ?? '[]'),
+                    'rounds'                      => (string)($fb['rounds'] ?? ''),
+                    'rewards'                     => (string)($fb['rewards'] ?? ''),
+                ];
+                $data['guild_dungeon_battle_rewards'] = [[
+                    'id'                     => (int)$myReward['id'],
+                    'guild_dungeon_battle_id'=> (int)$myReward['guild_battle_id'],
+                    'character_id'           => (int)$myReward['character_id'],
+                    // Chaves obrigatorias do DOGuildDungeonBattleReward — se
+                    // faltarem, getInt("xp") lanca "unknown field" no cliente.
+                    'game_currency'          => (int)$myReward['game_currency'],
+                    'xp'                     => (int)($myReward['xp'] ?? 0),
+                    'item_id'                => (int)$myReward['item_id'],
+                    'training'               => 0,
+                    'energy'                 => 0,
+                    'status'                 => (int)$myReward['status'],
+                    'type'                   => (int)$myReward['type'],
+                ]];
+            }
+        }
+
+        return $data;
+    }
+    /**
+     * Shape de uma linha guild_battle para o DOGuildBattle do cliente.
+     * Pendente (status=1): campos limitados + character_ids (STRING JSON),
+     * igual a getDataForAttacker/Defender do servidor antigo. Terminada:
+     * todos os campos.
+     */
+    private static function guildBattleShape(array $b, bool $attackerView): array
+    {
+        $idsKey = $attackerView ? 'attacker_character_ids' : 'defender_character_ids';
+        $base = [
+            'id'                  => (int)$b['id'],
+            'status'              => (int)$b['status'],
+            'ts_attack'           => (int)$b['ts_attack'],
+            'battle_time'         => (int)$b['battle_time'],
+            'guild_attacker_id'   => (int)$b['guild_attacker_id'],
+            'guild_defender_id'   => (int)$b['guild_defender_id'],
+            // STRING JSON — o cliente faz getFromJson(getString("character_ids"))
+            'character_ids'       => (string)($b[$idsKey] ?? '[]'),
+        ];
+        if ((int)$b['status'] !== 1) {
+            $base['guild_winner_id']              = (int)($b['guild_winner_id'] ?? 0);
+            $base['attacker_character_profiles']  = \HeroZero\GuildBattles::clientProfiles((string)($b['attacker_character_profiles'] ?? ''));
+            $base['defender_character_profiles']  = \HeroZero\GuildBattles::clientProfiles((string)($b['defender_character_profiles'] ?? ''));
+            $base['rounds']                       = (string)($b['rounds'] ?? '');
+            $base['attacker_rewards']             = (string)($b['attacker_rewards'] ?? '');
+            $base['defender_rewards']             = (string)($b['defender_rewards'] ?? '');
+        }
+        return $base;
     }
 }

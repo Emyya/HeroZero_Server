@@ -18,6 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'request.php',
             'beta-api',
             'clientlog',
+            'servertime',
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

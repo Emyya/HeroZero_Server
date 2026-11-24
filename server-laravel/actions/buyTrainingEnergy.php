@@ -2,9 +2,8 @@
 declare(strict_types=1);
 
 /**
- * action: buyTrainingEnergy  (recarregar sessoes de treino com moeda premium)
- * SEM captura real desta resposta no HAR; custo estimado (5 premium, flat) seguindo
- * o mesmo padrao de buySenseBooster.php. Devolve o boot completo (accountState).
+ * action: buyTrainingEnergy  (+15 training_energy, custo 1 premium (donut))
+ * constants: training_energy_refill_amount = 15.
  */
 
 use HeroZero\Character;
@@ -12,9 +11,8 @@ use HeroZero\Live;
 
 return function (array $params): array {
     $userId = (int)($params['user_id'] ?? 0);
-    $premiumCost = 5;
 
     $char = Character::loadByUser($userId);
-    $char->buyTrainingEnergy($premiumCost);
+    $char->buyTrainingEnergy(1);
     return Live::accountState($userId);
 };

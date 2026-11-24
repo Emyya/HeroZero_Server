@@ -64,10 +64,15 @@ return function (array $params): array {
     }
 
     if (($params['action'] ?? '') === 'getGuildList') {
+        // Cliente oficial: 50. Os bots podem pedir uma amostra maior para não
+        // ignorar vagas quando a população já tiver dezenas de equipas.
+        $listLimit = max(50, min(500, (int)($params['limit'] ?? 50)));
         // Lista de guildas para o painel de "procurar guilda" (so as que aceitam membros).
         $rows = Db::rows(
             'SELECT g.id, g.name, g.description, g.honor, g.stat_guild_capacity,
                     g.min_apply_level, g.min_apply_honor, g.accept_members,
+                    g.stat_character_base_stats_boost, g.stat_quest_xp_reward_boost,
+                    g.stat_quest_game_currency_reward_boost,
                     g.emblem_background_shape, g.emblem_background_color,
                     g.emblem_background_border_color, g.emblem_icon_shape,
                     g.emblem_icon_color, g.emblem_icon_size,
@@ -78,7 +83,8 @@ return function (array $params): array {
               WHERE g.status = 1 AND g.accept_members = 1
               GROUP BY g.id
               ORDER BY g.honor DESC
-              LIMIT 50'
+              LIMIT ?',
+            [$listLimit]
         );
         $list = [];
         foreach ($rows as $row) {
@@ -100,64 +106,196 @@ return function (array $params): array {
                 'emblem_icon_color' => (int)$row['emblem_icon_color'],
                 'emblem_icon_size' => (int)$row['emblem_icon_size'],
                 'locale' => 'pt_BR',
-                // Cliente crasha (DataObject: unknown field total_percentage) sem isso:
-                // get_fullTotalPercentage() dos itens da lista de guildas le esta chave.
-                // Capacidade preenchida (membros/vagas), 0-100.
-                'total_percentage' => (int)$row['stat_guild_capacity'] > 0
-                    ? min(100, (int)round(((int)$row['member_count'] / (int)$row['stat_guild_capacity']) * 100))
-                    : 0,
+                // Cliente crasha (DataObject: unknown field total_percentage) sem isso.
+                // get_fullTotalPercentage() faz Math.round(100*tp): FRACAO 0-1, com o
+                // MESMO divisor das estatisticas da team (Va.totalImprovementPercentage
+                // usa `guild_percentage_total_real` = 180) e do ranking — assim os tres
+                // ecras mostram o mesmo valor (antes era ocupacao membros/capacidade em
+                // % inteira: o cliente multiplicava por 100 e mostrava 600%/900%).
+                'total_percentage' => min(
+                    1,
+                    ((int)$row['stat_guild_capacity']
+                        + (int)$row['stat_character_base_stats_boost']
+                        + (int)$row['stat_quest_xp_reward_boost']
+                        + (int)$row['stat_quest_game_currency_reward_boost']) / 180
+                ),
             ];
         }
         $data['guild_entries'] = $list;
         return $data;
     }
 
+    // ------------------------------------------------------------------
+    // Historico de lutas da team (DialogGuildBattleHistory). Formato OFICIAL
+    // (DOGuildHistoryBattle): o cliente le type/id/battle_timestamp/enemy/
+    // joined_character_ids/rewards/enemy_name/emblema por entrada; "won" TEM
+    // de ser booleano JSON (getBoolean faz cast — 1/0 devolve sempre false)
+    // e "rewards" e STRING JSON donde sai get_honorReward() -> chave "honor".
+    // ------------------------------------------------------------------
     if (($params['action'] ?? '') === 'getGuildBattleHistoryFights') {
         $char = Character::loadByUser($userId);
-        $member = Db::row('SELECT guild_id FROM `character` WHERE id = ? LIMIT 1', [$char->id()]);
-        $guildId = (int)($member['guild_id'] ?? 0);
-        $rows = $guildId > 0 ? Db::rows(
-            'SELECT id, status, battle_time, ts_attack, guild_attacker_id, guild_defender_id, guild_winner_id
-               FROM `guild_battle`
-              WHERE guild_attacker_id = ? OR guild_defender_id = ?
-              ORDER BY id DESC LIMIT 30',
+        $guildId = (int)(Db::value('SELECT guild_id FROM `character` WHERE id = ?', [$char->id()]) ?? 0);
+        if ($guildId <= 0) {
+            throw new GameError('errNotInGuild');
+        }
+
+        $battles = [];
+
+        // Guilda-vs-guilda resolvidas (status=3) em que participamos.
+        // Honra do nosso lado vem de attacker/defender_rewards ({"honor": N},
+        // ja com sinal — vencedor positivo, perdedor negativo).
+        $rows = Db::rows(
+            'SELECT gb.id, gb.ts_attack, gb.guild_attacker_id, gb.guild_defender_id,
+                    gb.guild_winner_id, gb.attacker_character_ids, gb.defender_character_ids,
+                    gb.attacker_rewards, gb.defender_rewards,
+                    ga.name AS attacker_name,
+                    ga.emblem_background_shape AS a_ebs, ga.emblem_background_color AS a_ebc,
+                    ga.emblem_background_border_color AS a_ebbc, ga.emblem_icon_shape AS a_eis,
+                    ga.emblem_icon_color AS a_eic, ga.emblem_icon_size AS a_eiz,
+                    gd.name AS defender_name,
+                    gd.emblem_background_shape AS d_ebs, gd.emblem_background_color AS d_ebc,
+                    gd.emblem_background_border_color AS d_ebbc, gd.emblem_icon_shape AS d_eis,
+                    gd.emblem_icon_color AS d_eic, gd.emblem_icon_size AS d_eiz
+               FROM `guild_battle` gb
+               LEFT JOIN `guild` ga ON ga.id = gb.guild_attacker_id
+               LEFT JOIN `guild` gd ON gd.id = gb.guild_defender_id
+              WHERE gb.status = 3 AND (gb.guild_attacker_id = ? OR gb.guild_defender_id = ?)
+              ORDER BY gb.ts_attack DESC LIMIT 50',
             [$guildId, $guildId]
-        ) : [];
-        $list = [];
+        );
         foreach ($rows as $row) {
-            $list[] = [
-                'id' => (int)$row['id'],
-                'type' => 1,
-                'status' => (int)$row['status'],
-                'battle_time' => (int)$row['battle_time'],
-                'ts_attack' => (int)$row['ts_attack'],
-                'guild_attacker_id' => (int)$row['guild_attacker_id'],
-                'guild_defender_id' => (int)$row['guild_defender_id'],
-                'guild_winner_id' => (int)$row['guild_winner_id'],
+            $isAttacker = (int)$row['guild_attacker_id'] === $guildId;
+            $prefix = $isAttacker ? 'd_' : 'a_'; // colunas do EMBLEMA do inimigo
+            $sideRewards = json_decode((string)($isAttacker ? $row['attacker_rewards'] : $row['defender_rewards']), true);
+            $battles[] = [
+                'id'                   => (int)$row['id'],
+                'type'                 => $isAttacker ? 1 : 2,
+                'enemy'                => (int)($isAttacker ? $row['guild_defender_id'] : $row['guild_attacker_id']),
+                'battle_timestamp'     => (int)$row['ts_attack'],
+                'won'                  => (int)$row['guild_winner_id'] === $guildId,
+                'joined_character_ids' => (string)($isAttacker ? $row['attacker_character_ids'] : $row['defender_character_ids']),
+                'rewards'              => is_array($sideRewards) ? json_encode($sideRewards) : '',
+                'enemy_name'           => (string)($isAttacker ? ($row['defender_name'] ?? '') : ($row['attacker_name'] ?? '')),
+                'ebs'                  => (int)$row[$prefix . 'ebs'],
+                'ebc'                  => (int)$row[$prefix . 'ebc'],
+                'ebbc'                 => (int)$row[$prefix . 'ebbc'],
+                'eis'                  => (int)$row[$prefix . 'eis'],
+                'eic'                  => (int)$row[$prefix . 'eic'],
+                'eiz'                  => (int)$row[$prefix . 'eiz'],
             ];
         }
-        $data['guild_battle_history_fights'] = $list;
+
+        // Batalhas de dungeon resolvidas (type 3): "enemy" e o IDENTIFICADOR
+        // da gangue NPC (string — o cliente resolve o nome via chave de texto
+        // guild_dungeon_team/<identificador>/name) e "won" = rewards pagos.
+        $dungeonRows = Db::rows(
+            'SELECT id, ts_attack, npc_team_identifier, character_ids, rewards
+               FROM `guild_dungeon_battle`
+              WHERE guild_id = ? AND status = 3
+              ORDER BY ts_attack DESC LIMIT 50',
+            [$guildId]
+        );
+        foreach ($dungeonRows as $row) {
+            $rewards = json_decode((string)$row['rewards'], true);
+            $battles[] = [
+                'id'                   => (int)$row['id'],
+                'type'                 => 3,
+                'enemy'                => (string)$row['npc_team_identifier'],
+                'battle_timestamp'     => (int)$row['ts_attack'],
+                'won'                  => is_array($rewards) && (int)($rewards['game_currency'] ?? 0) > 0,
+                'joined_character_ids' => (string)$row['character_ids'],
+                'rewards'              => (string)$row['rewards'],
+                'enemy_name'           => '',
+                'ebs'                  => 0,
+                'ebc'                  => 0,
+                'ebbc'                 => 0,
+                'eis'                  => 0,
+                'eic'                  => 0,
+                'eiz'                  => 0,
+            ];
+        }
+
+        usort($battles, static fn(array $a, array $b): int => $b['battle_timestamp'] <=> $a['battle_timestamp']);
+        $data['guild_history_battles'] = array_slice($battles, 0, 50);
         return $data;
     }
 
     if (($params['action'] ?? '') === 'getGuildBattleHistoryFight') {
-        $fightId = (int)($params['id'] ?? 0);
+        // Detalhe de uma luta do historico (param OFICIAL type=1|2|3 + id).
+        // type 3 = batalha de dungeon; 1/2 = luta guilda-vs-guilda (nosso lado
+        // determinado pela guilda do jogador). Com "rounds" guardados o cliente
+        // abre o replay normal da batalha (review mode).
+        $char = Character::loadByUser($userId);
+        $guildId = (int)(Db::value('SELECT guild_id FROM `character` WHERE id = ?', [$char->id()]) ?? 0);
+        if ($guildId <= 0) {
+            throw new GameError('errNotInGuild');
+        }
         $type = (int)($params['type'] ?? 1);
-        $row = $type === 2
-            ? Db::row('SELECT * FROM `guild_dungeon_battle` WHERE id = ?', [$fightId])
-            : Db::row('SELECT * FROM `guild_battle` WHERE id = ?', [$fightId]);
+        $fightId = (int)($params['id'] ?? 0);
+
+        if ($type === 3) {
+            // Mesmo shape do finished_guild_dungeon_battle (funciona no cliente).
+            $row = Db::row(
+                'SELECT * FROM `guild_dungeon_battle` WHERE id = ? AND guild_id = ? AND status = 3',
+                [$fightId, $guildId]
+            );
+            if ($row === null) {
+                throw new GameError('errGetGuildBattleHistoryFightNotFound');
+            }
+            $data['guild_history_battle'] = [
+                'id'                          => (int)$row['id'],
+                'guild_id'                    => (int)$row['guild_id'],
+                'battle_time'                 => (int)$row['battle_time'],
+                'ts_attack'                   => (int)$row['ts_attack'],
+                'npc_team_identifier'         => (string)$row['npc_team_identifier'],
+                'status'                      => (int)$row['status'],
+                'settings'                    => (string)$row['settings'],
+                'character_ids'               => (string)($row['character_ids'] ?? '[]'),
+                'joined_character_profiles'   => (string)($row['joined_character_profiles'] ?? '[]'),
+                'npc_team_character_profiles' => (string)($row['npc_team_character_profiles'] ?? '[]'),
+                'rounds'                      => (string)($row['rounds'] ?? ''),
+                'rewards'                     => (string)($row['rewards'] ?? ''),
+            ];
+            return $data;
+        }
+
+        $row = Db::row(
+            'SELECT * FROM `guild_battle` WHERE id = ? AND status = 3 AND (guild_attacker_id = ? OR guild_defender_id = ?)',
+            [$fightId, $guildId, $guildId]
+        );
         if ($row === null) {
             throw new GameError('errGetGuildBattleHistoryFightNotFound');
         }
-        $fight = $row;
-        foreach ($fight as $k => $v) {
-            if (is_numeric($v) && !in_array($k, ['attacker_character_ids', 'defender_character_ids', 'character_ids'], true)) {
-                $fight[$k] = ctype_digit((string)$v) || (is_string($v) && preg_match('/^-?\d+$/', $v)) ? (int)$v : $v;
-            }
+        $isAttacker = (int)$row['guild_attacker_id'] === $guildId;
+
+        // Shape completo do DOGuildBattle (igual ao finished_guild_battle_*),
+        // com character_ids = os do NOSSO lado (o cliente conta membros por ele).
+        $battle = [
+            'id'                           => (int)$row['id'],
+            'status'                       => (int)$row['status'],
+            'ts_attack'                    => (int)$row['ts_attack'],
+            'battle_time'                  => (int)$row['battle_time'],
+            'guild_attacker_id'            => (int)$row['guild_attacker_id'],
+            'guild_defender_id'            => (int)$row['guild_defender_id'],
+            'character_ids'                => (string)($isAttacker ? $row['attacker_character_ids'] : $row['defender_character_ids']),
+            'guild_winner_id'              => (int)($row['guild_winner_id'] ?? 0),
+            'attacker_character_profiles'  => \HeroZero\GuildBattles::clientProfiles((string)($row['attacker_character_profiles'] ?? '')),
+            'defender_character_profiles'  => \HeroZero\GuildBattles::clientProfiles((string)($row['defender_character_profiles'] ?? '')),
+            'rounds'                       => (string)($row['rounds'] ?? ''),
+            'attacker_rewards'             => (string)($row['attacker_rewards'] ?? ''),
+            'defender_rewards'             => (string)($row['defender_rewards'] ?? ''),
+        ];
+        $data['guild_history_battle'] = $battle;
+
+        // Guilda adversaria: o cliente resolve get_attacker()/get_defender()
+        // da luta a partir desta lista (Va.getGuildBattleGuild).
+        $opp = Db::row(
+            'SELECT * FROM `guild` WHERE id = ?',
+            [(int)($isAttacker ? $row['guild_defender_id'] : $row['guild_attacker_id'])]
+        );
+        if ($opp !== null) {
+            $data['guild_battle_guilds'][] = Live::shapeGuild($opp);
         }
-        $fight['id'] = $fightId;
-        $fight['type'] = $type;
-        $data['guild_battle_history_fight'] = $fight;
         return $data;
     }
 

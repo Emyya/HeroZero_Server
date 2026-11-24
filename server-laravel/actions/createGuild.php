@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+use HeroZero\GameTime;
+
 use HeroZero\Character;
 use HeroZero\Db;
 use HeroZero\GameError;
@@ -29,7 +31,7 @@ return function (array $params): array {
         throw new GameError('errCreateNameAlreadyExists');
     }
 
-    $now = time();
+    $now = GameTime::now();
     $acceptMembers = filter_var($params['accept_members'] ?? true, FILTER_VALIDATE_BOOLEAN);
 
     Db::exec(

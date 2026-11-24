@@ -12,6 +12,10 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout']);
 
 Route::middleware('admin')->group(function () {
+    Route::get('/bonuses', [\App\Http\Controllers\BonusController::class, 'index']);
+    Route::post('/bonuses', [\App\Http\Controllers\BonusController::class, 'store']);
+    Route::post('/bonuses/{id}/cancel', [\App\Http\Controllers\BonusController::class, 'cancel']);
+
     Route::get('/', [AdminController::class, 'dashboard']);
 
     // Contas

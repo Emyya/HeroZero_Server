@@ -48,6 +48,13 @@ Do not set `HZ_ALLOW_FAKE_PAYMENTS=1` in production. A real payment provider and
 verified webhook must credit premium currency; `initPayment` is intentionally
 disabled in production until that integration exists.
 
+## Local purchases (2026-10-07)
+
+The private local flow now validates catalog products and delivers them for free,
+with atomic receipts and retry protection. See [local purchases](compras/overview.md).
+The production environment guard above remains in place; no real payment provider
+has been added.
+
 ## Release blockers
 
 This repository is not yet suitable for a public, paid production launch because:
@@ -58,7 +65,9 @@ This repository is not yet suitable for a public, paid production launch because
    `limit_req` rate limiting + WebSocket proxy), a dedicated PHP-FPM pool, systemd
    units for the socket server and queue worker, a daily `mysqldump` backup with
    rotation, and an active healthcheck (web+socket+db) with webhook alerting.
-   App-layer rate limiting (`throttle:game`/`throttle:auth`) adds defense-in-depth.
+   A API beta de contas mantém `throttle:auth`. O limite por IP em `/request.php`
+   foi removido na stack local porque todos os bots Docker partilham o mesmo IP;
+   instalações públicas devem rever os limites no proxy de entrada.
    See `deploy/README.md`.
 3. Original game assets and trademarks require the appropriate distribution rights.
 

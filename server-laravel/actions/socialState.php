@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+use HeroZero\GameTime;
+
 use HeroZero\Character;
 use HeroZero\Db;
 use HeroZero\Live;
@@ -15,6 +17,10 @@ return function (array $params): array {
         $data['all_loaded'] = true;
         $data['private_conversations'] = [];
     } elseif ($action === 'getStreamMessages') {
+        if (($params['stream_type'] ?? '') === 'v') {
+            if ((int)($params['stream_id'] ?? 0) !== $char->id()) throw new \HeroZero\GameError('errCheckVoucherRequirementsWrongUser');
+            \HeroZero\UserVouchers::markRead($char->id());
+        }
         $data['stream_id'] = (int)($params['stream_id'] ?? 0);
         $data['all_loaded'] = true;
         foreach (['private_system_messages', 'private_messages', 'guild_messages'] as $key) {
@@ -38,7 +44,8 @@ return function (array $params): array {
         ], $rows);
     }
 
-    $data['server_time'] = time();
+    $data['server_time'] = GameTime::now();
+    $data = \HeroZero\UserVouchers::attach($data, $char->id());
     $data['time_correction'] = 0;
     return $data;
 };

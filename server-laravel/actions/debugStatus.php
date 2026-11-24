@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+use HeroZero\GameTime;
+
 use HeroZero\Db;
 
 return function (array $params): array {
@@ -16,9 +18,9 @@ return function (array $params): array {
         'debug_status' => [
             'ok' => true,
             'user' => $user,
-            'server_time' => time(),
+            'server_time' => GameTime::now(),
         ],
-        'server_time' => time(),
+        'server_time' => GameTime::now(),
         'time_correction' => 0,
     ];
 };

@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+use HeroZero\GameTime;
+
 /**
  * action: startQuest  (iniciar uma missao)
  * Entrada: quest_id
@@ -52,7 +54,7 @@ return function (array $params): array {
     foreach (['server_time', 'time_correction'] as $k) {
         if (array_key_exists($k, $tpl)) $data[$k] = $tpl[$k];
     }
-    if (!array_key_exists('server_time', $data)) $data['server_time'] = time();
+    if (!array_key_exists('server_time', $data)) $data['server_time'] = GameTime::now();
     if (!array_key_exists('time_correction', $data)) $data['time_correction'] = 0;
-    return $data;
+    return \HeroZero\DailyMilestones::attachAll($data, $char->id());
 };

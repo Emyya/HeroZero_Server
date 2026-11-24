@@ -13,6 +13,7 @@ declare(strict_types=1);
  */
 
 use HeroZero\Character;
+use HeroZero\Tournament;
 use HeroZero\Db;
 use HeroZero\GameError;
 use HeroZero\Live;
@@ -44,11 +45,10 @@ return function (array $params): array {
           WHERE id = ?',
         [$session, (int)$u['id']]
     );
-    $char = Character::loadByUser((int)$u['id']);
-
-    $data = Live::template('autoLoginUser');
-    if (isset($data['user'])) $data['user'] = $char->overlayUser($data['user']);
-    if (isset($data['character'])) $data['character'] = $char->overlayCharacter($data['character']);
+    Tournament::ensureCharacterSnapshot(Character::loadByUser((int)$u['id']));
+    // Mesmo estado vivo usado pelas respostas normais: nunca servir quests,
+    // inventário ou itens de outra personagem capturados no template.
+    $data = Live::withLocalConstants(Live::accountState((int)$u['id']));
     $data['user']['session_id'] = $session;
     return $data;
 };

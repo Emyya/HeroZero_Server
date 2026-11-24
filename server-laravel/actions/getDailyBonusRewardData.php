@@ -3,8 +3,7 @@ declare(strict_types=1);
 
 /**
  * action: getDailyBonusRewardData
- * Config de recompensas (daily_bonus_reward_data) e o lookup vem do template capturado;
- * `character` e `user` sao sobrescritos com o estado vivo do banco.
+ * Config capturada dos outros bónus; patamares de energia e conta são vivos.
  */
 
 use HeroZero\Character;
@@ -19,6 +18,7 @@ return function (array $params): array {
         if (isset($data['user']))      $data['user']      = $char->overlayUser($data['user']);
         unset($data['trainings']);
         $data = Live::attachTrainingState($data, $char);
+        $data = \HeroZero\DailyMilestones::attachAll($data, $char->id());
     } catch (\HeroZero\GameError $e) {
         // sem personagem no banco -> devolve o template puro (nao trava o boot).
     }

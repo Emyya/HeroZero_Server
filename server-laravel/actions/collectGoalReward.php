@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+use HeroZero\GameTime;
+
 use HeroZero\Character;
 use HeroZero\Db;
 use HeroZero\Live;
@@ -12,7 +14,7 @@ return function (array $params): array {
     if ($identifier !== '' && $value > 0) {
         Db::exec(
             'INSERT IGNORE INTO `collected_goals` (character_id, goal_name, milestone_value, collected_at) VALUES (?, ?, ?, ?)',
-            [$char->id(), $identifier, $value, time()]
+            [$char->id(), $identifier, $value, GameTime::now()]
         );
     }
     $data = Live::overlayAccount(Live::template('collectGoalReward'), (int)$params['user_id']);

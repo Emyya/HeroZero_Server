@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+use HeroZero\GameTime;
+
 use HeroZero\Character;
 use HeroZero\Live;
 
@@ -26,6 +28,6 @@ return function (array $params): array {
             'is_guild_member' => false,
         ]],
         'time_correction' => 0,
-        'server_time' => time(),
+        'server_time' => GameTime::now(),
     ];
 };

@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+use HeroZero\GameTime;
+
 /**
  * action: donateToGuild  (doar moeda de jogo/premium ao cofre da guilda)
  * Entrada: game_currency_amount, premium_currency_amount
@@ -64,7 +66,7 @@ return function (array $params): array {
         Db::exec(
             "INSERT INTO `guild_logs` (guild_id, character_id, character_name, type, value1, value2, value3, timestamp)
              VALUES (?, ?, ?, 3, ?, ?, '', ?)",
-            [(int)$guild['id'], $char->id(), $char->name(), (string)$gameAmount, (string)$premiumAmount, time()]
+            [(int)$guild['id'], $char->id(), $char->name(), (string)$gameAmount, (string)$premiumAmount, GameTime::now()]
         );
         $pdo->commit();
     } catch (\Throwable $e) {

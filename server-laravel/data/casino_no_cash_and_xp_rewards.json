@@ -1,0 +1,270 @@
+[
+  {
+    "name": "Objetos e acompanhantes",
+    "headerColorIndex": 2,
+    "rewards": [
+      {
+        "minLevel": 1,
+        "maxLevel": 0,
+        "quality": 3,
+        "genericRewardType": 6,
+        "genericRewardAmount": 1,
+        "genericRewardData": {
+          "identifier": "suit_casino_luck"
+        }
+      },
+      {
+        "minLevel": 1,
+        "maxLevel": 0,
+        "quality": 3,
+        "genericRewardType": 6,
+        "genericRewardAmount": 1,
+        "genericRewardData": {
+          "identifier": "mask_casino_luck"
+        }
+      },
+      {
+        "minLevel": 1,
+        "maxLevel": 0,
+        "quality": 3,
+        "genericRewardType": 6,
+        "genericRewardAmount": 1,
+        "genericRewardData": {
+          "identifier": "cape_casino_luck"
+        }
+      },
+      {
+        "minLevel": 1,
+        "maxLevel": 0,
+        "quality": 3,
+        "genericRewardType": 6,
+        "genericRewardAmount": 1,
+        "genericRewardData": {
+          "identifier": "boots_casino_luck"
+        }
+      },
+      {
+        "minLevel": 1,
+        "maxLevel": 0,
+        "quality": 3,
+        "genericRewardType": 6,
+        "genericRewardAmount": 1,
+        "genericRewardData": {
+          "identifier": "belt_casino_luck"
+        }
+      },
+      {
+        "minLevel": 1,
+        "maxLevel": 0,
+        "quality": 3,
+        "genericRewardType": 6,
+        "genericRewardAmount": 1,
+        "genericRewardData": {
+          "identifier": "weapon_slotmachine_set1"
+        }
+      },
+      {
+        "minLevel": 1,
+        "maxLevel": 0,
+        "quality": 1,
+        "genericRewardType": 6,
+        "genericRewardAmount": 1,
+        "genericRewardData": {
+          "identifier": "missiles_slotmachine_set1"
+        }
+      },
+      {
+        "minLevel": 1,
+        "maxLevel": 0,
+        "quality": 3,
+        "genericRewardType": 11,
+        "genericRewardAmount": 1,
+        "genericRewardData": {
+          "identifier": "random_epic"
+        }
+      },
+      {
+        "minLevel": 60,
+        "maxLevel": 0,
+        "quality": 3,
+        "genericRewardType": 11,
+        "genericRewardAmount": 1,
+        "genericRewardData": {
+          "identifier": "random_sidekick"
+        }
+      }
+    ],
+    "preventDuplicates": false
+  },
+  {
+    "name": "Geral",
+    "headerColorIndex": 1,
+    "rewards": [
+      {
+        "minLevel": 1,
+        "maxLevel": 0,
+        "quality": 1,
+        "genericRewardType": 3,
+        "genericRewardAmount": 20,
+        "genericRewardData": null
+      },
+      {
+        "minLevel": 1,
+        "maxLevel": 0,
+        "quality": 3,
+        "genericRewardType": 3,
+        "genericRewardAmount": 100,
+        "genericRewardData": {
+          "texture": "icon_reward_quest_energy_great"
+        }
+      },
+      {
+        "minLevel": 1,
+        "maxLevel": 0,
+        "quality": 1,
+        "genericRewardType": 4,
+        "genericRewardAmount": 4,
+        "genericRewardData": null
+      },
+      {
+        "minLevel": 1,
+        "maxLevel": 0,
+        "quality": 3,
+        "genericRewardType": 4,
+        "genericRewardAmount": 40,
+        "genericRewardData": {
+          "texture": "icon_reward_training_sessions_great"
+        }
+      },
+      {
+        "minLevel": 1,
+        "maxLevel": 0,
+        "quality": 1,
+        "genericRewardType": 5,
+        "genericRewardAmount": 2,
+        "genericRewardData": null
+      },
+      {
+        "minLevel": 1,
+        "maxLevel": 0,
+        "quality": 3,
+        "genericRewardType": 5,
+        "genericRewardAmount": 20,
+        "genericRewardData": {
+          "texture": "icon_reward_stat_points_great"
+        }
+      },
+      {
+        "minLevel": 1,
+        "maxLevel": 0,
+        "quality": 1,
+        "genericRewardType": 8,
+        "genericRewardAmount": 1,
+        "genericRewardData": {
+          "booster_id": "booster_hideout2",
+          "days": 3
+        }
+      },
+      {
+        "minLevel": 1,
+        "maxLevel": 0,
+        "quality": 3,
+        "genericRewardType": 8,
+        "genericRewardAmount": 1,
+        "genericRewardData": {
+          "booster_id": "booster_hideout2",
+          "days": 14
+        }
+      },
+      {
+        "minLevel": 1,
+        "maxLevel": 0,
+        "quality": 1,
+        "genericRewardType": 8,
+        "genericRewardAmount": 1,
+        "genericRewardData": {
+          "booster_id": "booster_league2",
+          "days": 3
+        }
+      },
+      {
+        "minLevel": 1,
+        "maxLevel": 0,
+        "quality": 3,
+        "genericRewardType": 8,
+        "genericRewardAmount": 1,
+        "genericRewardData": {
+          "booster_id": "booster_league2",
+          "days": 14
+        }
+      },
+      {
+        "minLevel": 1,
+        "maxLevel": 0,
+        "quality": 1,
+        "genericRewardType": 8,
+        "genericRewardAmount": 1,
+        "genericRewardData": {
+          "booster_id": "booster_quest3",
+          "days": 3
+        }
+      },
+      {
+        "minLevel": 1,
+        "maxLevel": 0,
+        "quality": 3,
+        "genericRewardType": 8,
+        "genericRewardAmount": 1,
+        "genericRewardData": {
+          "booster_id": "booster_quest3",
+          "days": 14
+        }
+      },
+      {
+        "minLevel": 1,
+        "maxLevel": 0,
+        "quality": 1,
+        "genericRewardType": 8,
+        "genericRewardAmount": 1,
+        "genericRewardData": {
+          "booster_id": "booster_stats3",
+          "days": 3
+        }
+      },
+      {
+        "minLevel": 1,
+        "maxLevel": 0,
+        "quality": 3,
+        "genericRewardType": 8,
+        "genericRewardAmount": 1,
+        "genericRewardData": {
+          "booster_id": "booster_stats3",
+          "days": 14
+        }
+      },
+      {
+        "minLevel": 1,
+        "maxLevel": 0,
+        "quality": 1,
+        "genericRewardType": 8,
+        "genericRewardAmount": 1,
+        "genericRewardData": {
+          "booster_id": "booster_work3",
+          "days": 3
+        }
+      },
+      {
+        "minLevel": 1,
+        "maxLevel": 0,
+        "quality": 3,
+        "genericRewardType": 8,
+        "genericRewardAmount": 1,
+        "genericRewardData": {
+          "booster_id": "booster_work3",
+          "days": 14
+        }
+      }
+    ],
+    "preventDuplicates": false
+  }
+]

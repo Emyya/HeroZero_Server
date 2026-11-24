@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+use HeroZero\GameTime;
+
 use HeroZero\Character;
 use HeroZero\Db;
 use HeroZero\GameError;
@@ -51,7 +53,7 @@ return function (array $params): array {
         'INSERT INTO `guild_messages`
             (guild_id, character_from_id, character_from_name, character_to_id, is_officer, is_private, message, timestamp)
          VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-        [$guildId, $char->id(), $char->name(), $toId, $isOfficer ? 1 : 0, $toId > 0 ? 1 : 0, $message, time()]
+        [$guildId, $char->id(), $char->name(), $toId, $isOfficer ? 1 : 0, $toId > 0 ? 1 : 0, $message, GameTime::now()]
     );
     $messageId = (int)Db::pdo()->lastInsertId();
 
@@ -77,7 +79,7 @@ return function (array $params): array {
         'is_officer' => $isOfficer ? 1 : 0,
         'is_private' => $toId > 0 ? 1 : 0,
         'message' => $message,
-        'timestamp' => time(),
+        'timestamp' => GameTime::now(),
     ]);
     return $data;
 };

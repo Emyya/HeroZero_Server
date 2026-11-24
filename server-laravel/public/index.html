@@ -17,6 +17,11 @@
 		.brand-env code { color:#d9e0e5; }
 		.session { display:flex; align-items:center; gap:12px; min-width:0; }
 		.online { display:flex; align-items:center; gap:7px; color:var(--muted); font-size:12px; }
+		.server-clock { display:flex; align-items:center; gap:14px; font-variant-numeric:tabular-nums; white-space:nowrap; }
+		.server-clock-block { display:flex; flex-direction:column; align-items:center; line-height:1.2; }
+		.server-clock-time { color:var(--text); font-size:16px; font-weight:700; }
+		.server-clock-label { color:var(--muted); font-size:11px; }
+		.server-clock-sep { width:1px; height:28px; background:var(--line); }
 		.online-dot { width:8px; height:8px; border-radius:50%; background:var(--online); box-shadow:0 0 0 3px rgba(67,209,123,.13); }
 		.hero-name { font-size:14px; font-weight:700; max-width:220px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 		.account-link { display:inline-flex; align-items:center; gap:7px; height:34px; padding:0 11px; border:1px solid var(--line); border-radius:6px; color:var(--text); text-decoration:none; font-size:13px; font-weight:700; background:var(--surface-2); }
@@ -36,6 +41,7 @@
 		@media (max-width:680px) {
 			.topbar { height:54px; padding:0 12px; }
 			.brand-env,.online span,.account-link span { display:none; }
+			.server-clock { display:none; }
 			.session { gap:9px; }
 			.hero-name { max-width:120px; }
 			.account-link { width:34px; padding:0; justify-content:center; }
@@ -51,6 +57,7 @@
 			<div class="brand-mark" aria-hidden="true">HZ</div>
 			<div><div class="brand-name">Hero Zero</div><div class="brand-env">Servidor local · <code id="apiurl"></code></div></div>
 		</div>
+		<div class="server-clock" id="serverClock"></div>
 		<div class="session">
 			<div class="online"><i class="online-dot"></i><span>Online</span></div>
 			<div class="hero-name" id="whoami">Carregando...</div>
@@ -210,7 +217,7 @@
 			urlPublic:          location.origin + "/",
 			urlRequestServer:   location.origin + "/request.php",
 			urlSocketServer:    "",                 // socket ainda não emulado
-			urlCDN:             appCDNUrl,
+			urlCDN:             location.origin + "/cdn/",
 			userId:             String(hzIdentity.user_id),   // dispara autoLoginUser p/ ESTA conta
 			userSessionId:      String(hzIdentity.session_id),
 			testMode:           "false",
@@ -226,51 +233,59 @@
 			isFriendbarSupported: "false"
 		};
 		document.getElementById("apiurl").textContent = clientVars.urlRequestServer;
+
+		(function serverClock() {
+			var el = document.getElementById("serverClock");
+			// Base = server_time (GameTime::now(), JA inclui o offset de debug).
+			// Antes renderizava uptime%86400, que IGNORAVA o offset: ao avançar
+			// o tempo via /servertime, a topbar continuava com a hora antiga.
+            var baseServer = 0, epoch = 0, fetchedAt = performance.now(), connected = false;
+			var fmtTime = new Intl.DateTimeFormat('pt-PT', { timeZone: 'Europe/Lisbon', hour: '2-digit', minute: '2-digit' });
+			var fmtDate = new Intl.DateTimeFormat('pt-PT', { timeZone: 'Europe/Lisbon', day: '2-digit', month: '2-digit', year: 'numeric' });
+			function render() {
+				if (!baseServer) return;
+                var elapsed = connected ? Math.min(60, Math.floor((performance.now() - fetchedAt) / 1000)) : 0;
+				var total = baseServer + elapsed;
+				var d = new Date(total * 1000);
+				// Dia do servidor = dias decorridos desde o epoch (inclui offset,
+				// consistente com a hora mostrada).
+				var dayNow = Math.floor((total - epoch) / 86400) + 1;
+				var now = new Date();
+				var lh = pad(now.getHours()), lm = pad(now.getMinutes());
+				el.innerHTML =
+					'<div class="server-clock-block"><span class="server-clock-time">' + fmtTime.format(d) + '</span><span class="server-clock-label">Dia ' + dayNow + ' · ' + fmtDate.format(d) + '</span></div>' +
+					'<div class="server-clock-sep"></div>' +
+					'<div class="server-clock-block"><span class="server-clock-time">' + lh + ':' + lm + '</span><span class="server-clock-label">Local</span></div>';
+			}
+			function pad(n) { return n < 10 ? '0' + n : '' + n; }
+			function sync() {
+				fetch("/servertime").then(function(r){return r.json();}).then(function(j){
+					baseServer = j.server_time || 0;
+					epoch = j.epoch || 0;
+                    fetchedAt = performance.now();
+                    connected = true;
+					render();
+                }).catch(function(){ connected = false; render(); });
+			}
+			sync();
+			setInterval(sync, 60000);
+			render();
+			setInterval(render, 10000);
+		})();
 		document.getElementById("whoami").textContent = (hzIdentity.name || ('user ' + hzIdentity.user_id));
+	</script>
+
+	<script>
+		if ('serviceWorker' in navigator)
+			navigator.serviceWorker.register('/sw.js').then(function(r) {
+				console.log('[SW] registered, scope:', r.scope);
+			});
 	</script>
 
 	<!-- libs do cliente (mesmas versões da página oficial) -->
 	<script src="/js/jquery-3.3.1.min.js"></script>
 	<script src="/js/standalone.js?v=local-payment-2"></script>
 	<script>
-		// Pagamento local: o HTML oficial tem uma janela/iframe de billing.
-		// No embarque local nao temos esse DOM, entao confirmamos a compra sem quebrar a UI.
-		window.buyCurrency = function (url) {
-			window.__localPaymentDone = false;
-			var paymentWindow = document.getElementById("paymentWindow");
-			var paymentFrame = document.getElementById("paymentFrame");
-			var flashContainer = document.getElementById("flashContainer");
-			if (paymentWindow && paymentFrame && flashContainer) {
-				paymentWindow.style.display = "";
-				paymentFrame.style.backgroundColor = "";
-				paymentFrame.src = "about:blank";
-				paymentFrame.src = url;
-				flashContainer.style.left = "-2000px";
-				return;
-			}
-
-			var iframe = document.getElementById("localPaymentFrame");
-			if (!iframe) {
-				iframe = document.createElement("iframe");
-				iframe.id = "localPaymentFrame";
-				iframe.style.width = "0";
-				iframe.style.height = "0";
-				iframe.style.border = "0";
-				iframe.style.position = "absolute";
-				iframe.style.left = "-9999px";
-				document.body.appendChild(iframe);
-			}
-			iframe.src = url || "about:blank";
-
-			setTimeout(function () {
-				if (window.__localPaymentDone) return;
-				window.__localPaymentDone = true;
-				var appClient = document.getElementById("appClient");
-				if (appClient && typeof appClient.callbackBuyCurrency === "function") {
-					appClient.callbackBuyCurrency(true);
-				}
-			}, 250);
-		};
 
 		window.closePaymentWindow = function (success) {
 			if (window.__localPaymentDone) return;
@@ -289,6 +304,41 @@
 			}
 		};
 	</script>
+	<script src="/js/local-payments.js?v=1"></script>
+	<script>
+		/* Espelho de texturas: o CDN oficial (hz-static-2) já devolve 404 para
+		   alguns ficheiros antigos (ex.: ui.atlas/ui.ktx2 do build html5_257).
+		   Estão em espelho local em /assets/textures/ — pedidos XHR ao CDN para
+		   ficheiros que temos localmente são reescritos para a nossa origem. */
+		(function hzLocalTextures() {
+			var MIRRORED = {
+				"05cbdab7f6af27d85a1dcb91bf20d1ee.ktx2":1,"0765c49d20236f94f051292b8abd594d.atlas":1,
+				"09d9511ac097d806e2ec0466dca1051e.atlas":1,"0bc28b5c6c5ae28afc3f62621dd0a084.atlas":1,
+				"0d6688999ca9689c6b9bd58f7ddcfa61.ktx2":1,"1f40d5e433c7ebdbc394cf1ebb108053.ktx2":1,
+				"200020b92f1afbf9465c1c721480776c.atlas":1,"2dd92e894bf7008dbb6ebe1658b9b8bf.atlas":1,
+				"31e84aa157085439849e6b9a5614c33d.png":1,"3644f95ee4e105ed6a4f248e3efdff04.ktx2":1,
+				"47ed9cd83bfbc20685506fb2ee1e21f1.ktx2":1,"494e05c831d7fd39443557eddd6c9086.fnt":1,
+				"498312e6eae222c9d2ecbb8844d909da.atlas":1,"5ce66d548d270364d69d3ea07f482bd1.fnt":1,
+				"6160523b92c9e7938c477b47a88fb416.fnt":1,"66cc83ac285ab0e4428e56d215ebf65e.fnt":1,
+				"676477d777abfb9e99f4750ef24950a7.ktx2":1,"6956d714e01ea4c3affb0f7d40867ece.ktx2":1,
+				"6bf85baf7f1df5a67bb1e9c62c718a1f.atlas":1,"7772762d25ff5e0b8306620748257267.atlas":1,
+				"7a189f07c062fef542f4d25ac8d4c04a.atlas":1,"7a189f07c062fef542f4d25ac8d4c04a.ktx2":1,"83a359106b41a3aa4671976a8d0f64b6.ktx2":1,
+				"872b837a2b25e111ed9d1cb2b521c635.fnt":1,"8bd28888bdf6e13ab0784656de983ee7.atlas":1,
+				"a04119626c24ba111fa1a0f06c04dcc1.ktx2":1,"bba40d1f18a0b2bb3e67a0807db22803.atlas":1,
+				"bfef7b3b5d4cea999226c296e217c4f5.ktx2":1,"c16fdf9a97cea97c0b4b1db3708d8832.ktx2":1,
+				"c71954334c08214691ca2507c9e1c022.ktx2":1,"cb6c84097d80759bb654337b6f48e64f.png":1
+			};
+			var origOpen = XMLHttpRequest.prototype.open;
+			XMLHttpRequest.prototype.open = function () {
+				var u = String(arguments[1]);
+				var m = u.match(/^https:\/\/hz-static-2\.akamaized\.net\/assets\/textures\/([^?]+)(\?.*)?$/);
+				if (m && MIRRORED[m[1]]) arguments[1] = '/assets/textures/' + m[1] + (m[2] || '');
+				var t = u.match(/^https:\/\/hz-static-2\.akamaized\.net\/assets\/(i18n\/.+|data\/.+)$/);
+				if (t) arguments[1] = '/assets/' + t[1];
+				return origOpen.apply(this, arguments);
+			};
+		})();
+	</script>
 	<script src="/js/TweenLite.min.js"></script>
 	<script src="/js/TweenMax.min.js"></script>
 	<script src="/js/TimelineLite.min.js"></script>
@@ -303,7 +353,7 @@
 	</script>
 
 	<!-- o cliente (runtime lime/OpenFL vai embutido) -->
-	<script async onload="gameFileLoaded();" src="/js/HeroZero.min.js"></script>
+	<script async onload="gameFileLoaded();" src="/js/HeroZero.min.js?v=20261024-guild-history-hp-v5"></script>
 
 	<main class="game-shell">
 		<div id="appClient" style="cursor: default;"></div>

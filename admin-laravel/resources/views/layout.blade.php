@@ -44,6 +44,7 @@ form.inline { display:inline; }
   <a href="/" class="{{ request()->is('/') ? 'on' : '' }}">Painel</a>
   <a href="/users" class="{{ request()->is('users*') ? 'on' : '' }}">Contas</a>
   <a href="/guilds" class="{{ request()->is('guilds*') ? 'on' : '' }}">Guildas</a>
+  <a href="/bonuses" class="{{ request()->is('bonuses*') ? 'on' : '' }}">Dias de Bónus</a>
   <a href="/broadcast" class="{{ request()->is('broadcast') ? 'on' : '' }}">Mensagem global</a>
   <form method="post" action="/logout" style="margin-top:20px; padding:0 16px;">@csrf<button class="ghost" style="width:100%">Sair</button></form>
 </aside>

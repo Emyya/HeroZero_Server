@@ -1,0 +1,358 @@
+
+<title>Moedas por Missão</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap">
+
+<style>
+  :root {
+    --bg:        #0D1520;
+    --surface:   #141E2D;
+    --surface2:  #1C2A3D;
+    --border:    #1F3150;
+    --border2:   #2A4068;
+    --text:      #C4D2E8;
+    --text-dim:  #56728A;
+    --text-head: #8BA8C8;
+    --accent:    #3B9AE0;
+    --teal:      #2EC4B6;
+    --gold:      #E6982A;
+    --gold-bg:   rgba(230,152,42,0.10);
+    --purple:    #9B7AE0;
+    --green:     #4CAF7D;
+    --row-hover: rgba(59,154,224,0.06);
+  }
+  @media (prefers-color-scheme: light) {
+    :root:not([data-theme="dark"]) {
+      --bg:        #F0F4FA;
+      --surface:   #FFFFFF;
+      --surface2:  #E8EEF8;
+      --border:    #C8D6EC;
+      --border2:   #A8BEDC;
+      --text:      #1A2A40;
+      --text-dim:  #7090B0;
+      --text-head: #3A5070;
+      --row-hover: rgba(59,154,224,0.05);
+      --gold-bg:   rgba(230,152,42,0.08);
+    }
+  }
+  :root[data-theme="light"] {
+    --bg:        #F0F4FA;
+    --surface:   #FFFFFF;
+    --surface2:  #E8EEF8;
+    --border:    #C8D6EC;
+    --border2:   #A8BEDC;
+    --text:      #1A2A40;
+    --text-dim:  #7090B0;
+    --text-head: #3A5070;
+    --row-hover: rgba(59,154,224,0.05);
+    --gold-bg:   rgba(230,152,42,0.08);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    padding: 32px 24px 64px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .page-header { margin-bottom: 28px; }
+  .page-header h1 {
+    font-size: 18px; font-weight: 700; letter-spacing: -0.02em;
+    color: var(--text); margin-bottom: 6px;
+  }
+  .page-header p { font-size: 13px; color: var(--text-dim); max-width: 700px; line-height: 1.6; }
+
+  .badges { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
+  .badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 600;
+    padding: 4px 10px; border-radius: 4px;
+  }
+  .badge-gold { background: var(--gold-bg); border: 1px solid rgba(230,152,42,.35); color: var(--gold); }
+  .badge-teal { background: rgba(46,196,182,.12); border: 1px solid rgba(46,196,182,.3); color: var(--teal); }
+
+  /* Chosen (implemented) formula gets full width */
+  .chosen-wrap { margin-bottom: 24px; }
+  .layout { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+  @media (max-width: 900px) { .layout { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 600px) { .layout { grid-template-columns: 1fr; } }
+
+  .card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; overflow: hidden;
+  }
+  .card-head {
+    padding: 13px 16px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: flex-start; gap: 10px;
+  }
+  .tag {
+    flex-shrink: 0; font-family: 'JetBrains Mono', monospace;
+    font-size: 9px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase;
+    padding: 3px 7px; border-radius: 3px; margin-top: 2px;
+  }
+  .tag-r { background: rgba(224,80,80,.15); color: #E05050; border: 1px solid rgba(224,80,80,.3); }
+  .tag-q { background: rgba(59,154,224,.15); color: var(--accent); border: 1px solid rgba(59,154,224,.3); }
+  .tag-l { background: rgba(46,196,182,.15); color: var(--teal); border: 1px solid rgba(46,196,182,.3); }
+  .tag-s { background: rgba(155,122,224,.15); color: var(--purple); border: 1px solid rgba(155,122,224,.3); }
+
+  .card-head-text h2 { font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+  .formula-str {
+    font-family: 'JetBrains Mono', monospace; font-size: 10.5px; color: var(--text-dim); line-height: 1.8;
+  }
+  .formula-str em { font-style: normal; color: var(--teal); }
+  .formula-str s { text-decoration: none; color: var(--purple); }
+
+  .tw { overflow-x: auto; }
+  table {
+    width: 100%; border-collapse: collapse;
+    font-family: 'JetBrains Mono', monospace; font-size: 12px;
+    font-variant-numeric: tabular-nums;
+  }
+  thead tr.col-group { background: var(--surface2); border-bottom: 1px solid var(--border2); }
+  thead th {
+    position: sticky; top: 0; z-index: 1; background: var(--surface2);
+    box-shadow: inset 0 -1px 0 var(--border2);
+    padding: 7px 10px; text-align: right; font-size: 10px; font-weight: 600;
+    letter-spacing: .05em; text-transform: uppercase; color: var(--text-head); white-space: nowrap;
+  }
+  thead th:first-child { text-align: left; }
+  .th-s1  { color: var(--teal)   !important; }
+  .th-s50 { color: var(--accent) !important; }
+  .th-min { color: #E05050 !important; font-size: 9px !important; }
+  .th-avg { color: var(--gold)   !important; font-size: 9px !important; }
+  .th-max { color: var(--green)  !important; font-size: 9px !important; }
+  .th-grp { border-bottom: 2px solid; padding-bottom: 4px !important; }
+  .th-grp-s1  { border-color: var(--teal); }
+  .th-grp-s50 { border-color: var(--accent); }
+
+  tbody tr { border-bottom: 1px solid var(--border); transition: background .1s; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: var(--row-hover); }
+  tbody tr.target {
+    background: var(--gold-bg);
+    border-top: 1px solid rgba(230,152,42,.3);
+    border-bottom: 1px solid rgba(230,152,42,.3);
+  }
+  tbody tr.target td { color: var(--gold); }
+  tbody tr.zone-high td { opacity: .75; }
+
+  td { padding: 3.5px 10px; text-align: right; color: var(--text); }
+  tbody tr.decade td { border-top: 1px solid var(--border2); }
+  td:first-child { text-align: left; color: var(--text-dim); font-weight: 600; }
+  tbody tr.target td:first-child { color: var(--gold); font-weight: 700; }
+  td.td-min { color: #E05050; opacity: .85; }
+  td.td-avg { color: var(--gold); }
+  td.td-max { color: var(--green); }
+
+  .sep-row td { padding: 2px 10px; font-size: 9px; color: var(--text-dim);
+    letter-spacing: .07em; text-transform: uppercase; border-top: 1px dashed var(--border2); }
+
+  .card-foot {
+    padding: 7px 12px; border-top: 1px solid var(--border);
+    font-family: 'JetBrains Mono', monospace; font-size: 10.5px; color: var(--text-dim);
+  }
+
+  .card.chosen { border-color: var(--teal); }
+  .card.chosen .card-head { border-bottom-color: rgba(46,196,182,.3); }
+  .chosen-label {
+    font-size: 10px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase;
+    color: var(--teal); margin-bottom: 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .chosen-label::before { content: ''; display: block; width: 20px; height: 2px; background: var(--teal); border-radius: 1px; }
+
+  .other-label {
+    font-size: 10px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase;
+    color: var(--text-dim); margin-bottom: 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .other-label::before { content: ''; display: block; width: 20px; height: 2px; background: var(--border2); border-radius: 1px; }
+
+  .range-note {
+    font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-dim);
+    margin-top: 8px; padding: 8px 16px; background: var(--surface2);
+    border-top: 1px solid var(--border);
+  }
+  .range-note span { color: var(--text); }
+</style>
+
+<div class="page-header">
+  <h1>Moedas por Missão — Comparação de Fórmulas</h1>
+  <p>Fórmula implementada mostra o intervalo completo por missão individual (mín / média / máx). As outras fórmulas mostram apenas a média para comparação. Fila dourada = nível 300.</p>
+  <div class="badges">
+    <span class="badge badge-gold">◎ Alvo lvl300 stat1/50 → 30–40k · stat50/50 → 80–100k</span>
+    <span class="badge badge-teal">★ Alvo lvl400 stat50/50 → ~200k · lvl500 → ~400k</span>
+  </div>
+</div>
+
+<div class="chosen-label">Fórmula implementada — intervalo por missão</div>
+<div class="chosen-wrap" id="chosen-card"></div>
+
+<div class="other-label">Outras fórmulas — média (sem variância)</div>
+<div class="layout" id="other-cards"></div>
+
+<script>
+const fmt = n => {
+  n = Math.round(n);
+  if (n < 1000) return n.toString();
+  if (n < 1e6) return (n/1000).toFixed(n < 10000 ? 1 : 0).replace(/\.0$/,'') + 'k';
+  return (n/1e6).toFixed(2) + 'M';
+};
+
+const guildAntes = s => 1 + s*2/100;
+const guildNew   = s => 1 + s*0.031428;
+
+// Intervalo real por missão: energia 2–8, variância 0.85–1.15, escala dificuldade 1.0–1.5 (moedas)
+const ENERGY_REF = 7.5;
+const coins_min = (base, gm, s) => base * gm(s) / ENERGY_REF * 2   * 0.85 * 1.0;
+const coins_avg = (base, gm, s) => base * gm(s);
+const coins_max = (base, gm, s) => base * gm(s) / ENERGY_REF * 8   * 1.15 * 1.5;
+
+const levels = Array.from({length: 50}, (_, i) => (i + 1) * 10);
+const highLvl = 300;
+
+const formulas = [
+  {
+    tag:'Antes', tagClass:'tag-r', chosen: false,
+    label:'Quadrática — Original',
+    formulaHtml:'rand(lvl×0.8, lvl×1.2) × (lvl/2) × <em>G</em><br><em>G</em> = 1 + stat×2/100 &nbsp;→ stat=50: ×2.0',
+    base: l => (l*l)/2,
+    gm: guildAntes,
+  },
+  {
+    tag:'Quadrática', tagClass:'tag-q', chosen: false,
+    label:'Quadrática — Calibrada',
+    formulaHtml:'lvl² / 2.65 × <em>G</em><br><em>G</em> = 1 + stat×0.031 &nbsp;→ stat=50: ×2.57',
+    base: l => (l*l)/2.65,
+    gm: guildNew,
+  },
+  {
+    tag:'Linear + Cúbica', tagClass:'tag-l', chosen: true,
+    label:'Linear ≤300 · Cúbica >300 — Implementada',
+    formulaHtml:'113 × lvl × max(1, (lvl/300)²) × <em>G</em><br><em>G</em> = 1 + stat×0.031 &nbsp;→ stat=50: ×2.57',
+    base: l => 113 * l * Math.max(1, (l/300)**2),
+    gm: guildNew,
+  },
+  {
+    tag:'Raiz √', tagClass:'tag-s', chosen: false,
+    label:'Raiz Quadrada — Calibrada',
+    formulaHtml:'1960 × √lvl × <em>G</em><br><em>G</em> = 1 + stat×0.031 &nbsp;→ stat=50: ×2.57',
+    base: l => 1960 * Math.sqrt(l),
+    gm: guildNew,
+  },
+];
+
+// --- Chosen card (with min/avg/max) ---
+const chosen = formulas.find(f => f.chosen);
+(function() {
+  let rows = '';
+  let sep = false;
+  levels.forEach(lvl => {
+    if (!sep && lvl > highLvl) {
+      rows += `<tr class="sep-row"><td colspan="7">acima de 300 → escala cúbica</td></tr>`;
+      sep = true;
+    }
+    const b = chosen.base(lvl);
+    const isTarget = lvl === 300;
+    const isHigh   = lvl > highLvl;
+    const band = lvl % 100 === 0 && !isTarget ? ' decade' : '';
+    const cls  = (isTarget ? 'target' : isHigh ? 'zone-high' : '') + band;
+
+    rows += `<tr class="${cls}">
+      <td>${lvl}</td>
+      <td class="td-min">${fmt(coins_min(b, chosen.gm, 1))}</td>
+      <td class="td-avg">${fmt(coins_avg(b, chosen.gm, 1))}</td>
+      <td class="td-max">${fmt(coins_max(b, chosen.gm, 1))}</td>
+      <td class="td-min">${fmt(coins_min(b, chosen.gm, 50))}</td>
+      <td class="td-avg">${fmt(coins_avg(b, chosen.gm, 50))}</td>
+      <td class="td-max">${fmt(coins_max(b, chosen.gm, 50))}</td>
+    </tr>`;
+  });
+
+  const card = document.createElement('div');
+  card.className = 'card chosen';
+  card.innerHTML = `
+    <div class="card-head">
+      <span class="tag ${chosen.tagClass}">${chosen.tag}</span>
+      <div class="card-head-text">
+        <h2>${chosen.label}</h2>
+        <div class="formula-str">${chosen.formulaHtml}</div>
+      </div>
+    </div>
+    <div class="tw"><table>
+      <thead>
+        <tr>
+          <th rowspan="2" style="text-align:left;vertical-align:bottom">Nível</th>
+          <th colspan="3" class="th-s1 th-grp th-grp-s1">stat 1/50</th>
+          <th colspan="3" class="th-s50 th-grp th-grp-s50">stat 50/50</th>
+        </tr>
+        <tr>
+          <th class="th-min">mín</th><th class="th-avg">avg</th><th class="th-max">máx</th>
+          <th class="th-min">mín</th><th class="th-avg">avg</th><th class="th-max">máx</th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table></div>
+    <div class="range-note">
+      <span>mín</span> = energia 2 · variância −15% · tempo (×1.0) &nbsp;·&nbsp;
+      <span>avg</span> = energia média 7.5 · sem variância · sem dificuldade &nbsp;·&nbsp;
+      <span>máx</span> = energia 8 · variância +15% · hard (×1.5)
+    </div>
+  `;
+  document.getElementById('chosen-card').appendChild(card);
+})();
+
+// --- Other cards (avg only) ---
+formulas.filter(f => !f.chosen).forEach(f => {
+  let rows = '';
+  let sep = false;
+  levels.forEach(lvl => {
+    if (!sep && lvl > highLvl) {
+      rows += `<tr class="sep-row"><td colspan="4">acima de 300 → escala cúbica</td></tr>`;
+      sep = true;
+    }
+    const b = f.base(lvl);
+    const v1  = b * f.gm(1);
+    const v50 = b * f.gm(50);
+    const isTarget = lvl === 300;
+    const isHigh   = lvl > highLvl;
+    const band = lvl % 100 === 0 && !isTarget ? ' decade' : '';
+    rows += `<tr class="${(isTarget ? 'target' : isHigh ? 'zone-high' : '') + band}">
+      <td>${lvl}</td>
+      <td>${fmt(v1)}</td>
+      <td>${fmt(v50)}</td>
+      <td style="color:var(--text-dim);font-size:10px">×${(v50/Math.max(v1,0.01)).toFixed(1)}</td>
+    </tr>`;
+  });
+
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.innerHTML = `
+    <div class="card-head">
+      <span class="tag ${f.tagClass}">${f.tag}</span>
+      <div class="card-head-text">
+        <h2>${f.label}</h2>
+        <div class="formula-str">${f.formulaHtml}</div>
+      </div>
+    </div>
+    <div class="tw"><table>
+      <thead>
+        <tr class="col-group">
+          <th style="text-align:left">Nível</th>
+          <th class="th-s1">stat 1/50</th>
+          <th class="th-s50">stat 50/50</th>
+          <th style="color:var(--text-dim)">ratio</th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table></div>
+    <div class="card-foot">média sem variância &nbsp;·&nbsp; ★ fila dourada = nível 300</div>
+  `;
+  document.getElementById('other-cards').appendChild(card);
+});
+</script>

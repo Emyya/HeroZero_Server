@@ -22,6 +22,7 @@ return function (array $params): array {
     $data['requested_character'] = Live::requestedCharacter($characterId, ($data['requested_character'] ?? null) ?: ($boot['character'] ?? []));
     $data['requested_character_inventory'] = Live::inventoryForCharacter($characterId, ($data['requested_character_inventory'] ?? null) ?: ($boot['inventory'] ?? []));
     $data['requested_character_inventory_items'] = Live::itemsForCharacter($characterId, ($data['requested_character_inventory_items'][0] ?? null) ?: ($boot['items'][0] ?? []));
+    $data['requested_character_inventory_improvement_items'] = \HeroZero\ItemImprovement::data($characterId);
     $data['requested_character_optical_changes'] = [];
     $data['requested_character_allowed_to_attack'] = $characterId !== $viewer->id();
 
@@ -37,6 +38,14 @@ return function (array $params): array {
     } else {
         unset($data['requested_character_guild']);
     }
-    unset($data['requested_character_sidekick']);   // sem tabela de sidekicks ainda
+    // Sidekick ATIVO do personagem consultado (DO completo): o cliente faz
+    // refreshSidekick() com ele e toda a UI do perfil passa a mostra-lo.
+    // Sem ativo, omite-se a chave por completo (hasData -> null e seguro).
+    $reqSidekick = \HeroZero\Sidekick::activeRow($characterId);
+    if ($reqSidekick !== null) {
+        $data['requested_character_sidekick'] = \HeroZero\Sidekick::findOwned($characterId, (int)$reqSidekick['id']);
+    } else {
+        unset($data['requested_character_sidekick']);
+    }
     return $data;
 };

@@ -18,5 +18,10 @@ return function (array $params): array {
     if ($flag !== '') $flags[$flag] = true;
 
     Db::exec('UPDATE `character` SET tutorial_flags = ? WHERE id = ?', [json_encode($flags, JSON_UNESCAPED_SLASHES), $char->id()]);
-    return Live::overlayAccount(Live::template('setTutorialFlags'), (int)$params['user_id']);
+
+    // ENTREGA a conta INTEIRA (com o `character` e as `tutorial_flags` atualizadas).
+    // O cliente so marca a flag em memoria quando a resposta atualiza o character
+    // via updateData(); devolver um template vazio (sem character) deixa o cliente
+    // preso na ultima etapa (nunca ve mission_shown/first_mission etc. de volta).
+    return Live::accountState((int)$params['user_id']);
 };

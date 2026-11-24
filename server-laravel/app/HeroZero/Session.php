@@ -31,7 +31,7 @@ final class Session
     /** Actions que nunca exigem sessão (pré-login e logging de dev). */
     private const PUBLIC_ACTIONS = [
         'initEnvironment', 'initGame', 'loginUser', 'autoLoginUser', 'gameReportError', 'registerUser',
-        'registerUserSSO',
+        'registerUserSSO', 'registerBotAccount',
     ];
 
     /**

@@ -22,14 +22,16 @@ final class Replay
     /** Retorna o payload `data` da fixture, com o relógio ajustado para agora. */
     public static function data(string $action): array
     {
-        $raw = file_get_contents(self::DIR . '/' . $action . '.json');
-        $data = json_decode($raw, true);
+        $src = self::DIR . '/' . $action . '.json';
+        $data = AssetCache::slice('replay_' . $action, $src, static function () use ($src) {
+            return json_decode(file_get_contents($src), true);
+        });
         if (!is_array($data)) {
             throw new GameError('response_errorIO');
         }
         // sincroniza o relógio para o cliente não recusar por drift.
         if (array_key_exists('server_time', $data)) {
-            $data['server_time'] = time();
+            $data['server_time'] = GameTime::now();
         }
         if (array_key_exists('time_correction', $data)) {
             $data['time_correction'] = 0;
@@ -37,15 +39,15 @@ final class Replay
         // Fins de temporada/torneio sao datas absolutas da captura (jul/2026) e ficam
         // no passado -- o client trata a liga/torneio como encerrados no boot. Sao
         // ciclos semanais: rola para a proxima ocorrencia futura preservando dia/hora.
-        foreach (['league_season_end_timestamp', 'tournament_end_timestamp', 'global_tournament_end_timestamp'] as $k) {
+        foreach (['league_season_end_timestamp'] as $k) {
             if (isset($data[$k]) && is_numeric($data[$k]) && (int)$data[$k] > 0) {
                 $ts = (int)$data[$k];
-                while ($ts <= time()) {
+                while ($ts <= GameTime::now()) {
                     $ts += 7 * 86400;
                 }
                 $data[$k] = $ts;
             }
         }
-        return $data;
+        return array_replace($data, Tournament::calendarTimestamps());
     }
 }

@@ -1,0 +1,632 @@
+{
+ "1": {
+  "after_hit_effect": false,
+  "round_start_effect": true,
+  "sidekick_battle_effect_ids": [
+   1
+  ],
+  "single_round_effect": true,
+  "value1": true,
+  "value2": false,
+  "value3": false
+ },
+ "10": {
+  "after_hit_effect": true,
+  "round_start_effect": false,
+  "sidekick_battle_effect_ids": [
+   7
+  ],
+  "single_round_effect": true,
+  "value1": true,
+  "value2": true,
+  "value3": false
+ },
+ "101": {
+  "after_hit_effect": false,
+  "round_start_effect": false,
+  "sidekick_battle_effect_ids": [
+   101,
+   106
+  ],
+  "single_round_effect": false,
+  "value1": true,
+  "value2": false,
+  "value3": false
+ },
+ "102": {
+  "after_hit_effect": false,
+  "round_start_effect": false,
+  "sidekick_battle_effect_ids": [
+   102,
+   104,
+   108,
+   107,
+   110,
+   127,
+   133
+  ],
+  "single_round_effect": false,
+  "value1": true,
+  "value2": false,
+  "value3": false
+ },
+ "103": {
+  "after_hit_effect": false,
+  "round_start_effect": false,
+  "sidekick_battle_effect_ids": [
+   105
+  ],
+  "single_round_effect": false,
+  "value1": true,
+  "value2": false,
+  "value3": false
+ },
+ "104": {
+  "after_hit_effect": false,
+  "round_start_effect": false,
+  "sidekick_battle_effect_ids": [
+   103,
+   109,
+   1006,
+   1055,
+   139,
+   2002,
+   1071,
+   1075
+  ],
+  "single_round_effect": false,
+  "value1": true,
+  "value2": false,
+  "value3": false
+ },
+ "105": {
+  "after_hit_effect": false,
+  "round_start_effect": false,
+  "sidekick_battle_effect_ids": [
+   111,
+   1002,
+   1007,
+   1011,
+   1016,
+   1029,
+   1038,
+   1040,
+   1048,
+   1062,
+   1068,
+   1074
+  ],
+  "single_round_effect": false,
+  "value1": true,
+  "value2": false,
+  "value3": false
+ },
+ "106": {
+  "after_hit_effect": false,
+  "round_start_effect": false,
+  "sidekick_battle_effect_ids": [
+   112,
+   61,
+   119,
+   1013,
+   1017,
+   1021,
+   1023,
+   1027,
+   1035,
+   1037,
+   1043,
+   1045,
+   132,
+   1059,
+   1063,
+   1065,
+   1069,
+   1076
+  ],
+  "single_round_effect": false,
+  "value1": true,
+  "value2": false,
+  "value3": false
+ },
+ "107": {
+  "after_hit_effect": false,
+  "round_start_effect": false,
+  "sidekick_battle_effect_ids": [
+   113,
+   115,
+   1003,
+   1012,
+   1020,
+   1025,
+   1046,
+   1052,
+   138,
+   1058,
+   140,
+   144
+  ],
+  "single_round_effect": false,
+  "value1": true,
+  "value2": false,
+  "value3": false
+ },
+ "108": {
+  "after_hit_effect": false,
+  "round_start_effect": false,
+  "sidekick_battle_effect_ids": [
+   114,
+   1001,
+   117,
+   1010,
+   120,
+   121,
+   1014,
+   1018,
+   1026,
+   1034,
+   1042,
+   1044,
+   1047,
+   134,
+   135,
+   1056,
+   1067,
+   1072
+  ],
+  "single_round_effect": false,
+  "value1": true,
+  "value2": false,
+  "value3": false
+ },
+ "109": {
+  "after_hit_effect": false,
+  "round_start_effect": false,
+  "sidekick_battle_effect_ids": [
+   116,
+   1004,
+   1009,
+   1015,
+   122,
+   123,
+   1019,
+   124,
+   125,
+   126,
+   1024,
+   1036,
+   1039,
+   128,
+   129,
+   130,
+   131,
+   1051,
+   137,
+   1057,
+   1061,
+   1066,
+   1070,
+   141,
+   142,
+   143
+  ],
+  "single_round_effect": false,
+  "value1": true,
+  "value2": false,
+  "value3": false
+ },
+ "11": {
+  "after_hit_effect": true,
+  "round_start_effect": false,
+  "sidekick_battle_effect_ids": [
+   8,
+   69
+  ],
+  "single_round_effect": true,
+  "value1": true,
+  "value2": true,
+  "value3": false
+ },
+ "110": {
+  "after_hit_effect": false,
+  "round_start_effect": false,
+  "sidekick_battle_effect_ids": [
+   118,
+   136
+  ],
+  "single_round_effect": false,
+  "value1": true,
+  "value2": false,
+  "value3": false
+ },
+ "12": {
+  "after_hit_effect": false,
+  "round_start_effect": true,
+  "sidekick_battle_effect_ids": [
+   9,
+   16,
+   25,
+   32,
+   34,
+   65,
+   76,
+   82,
+   87,
+   94,
+   95,
+   1022,
+   100,
+   201,
+   202,
+   208,
+   1028,
+   1031,
+   1030,
+   1033,
+   214,
+   216,
+   221,
+   1041,
+   224,
+   227,
+   1049,
+   233,
+   235,
+   240,
+   242,
+   248,
+   254,
+   262,
+   1077
+  ],
+  "single_round_effect": true,
+  "value1": true,
+  "value2": true,
+  "value3": false
+ },
+ "13": {
+  "after_hit_effect": false,
+  "round_start_effect": true,
+  "sidekick_battle_effect_ids": [
+   3,
+   78,
+   230
+  ],
+  "single_round_effect": true,
+  "value1": true,
+  "value2": true,
+  "value3": false
+ },
+ "14": {
+  "after_hit_effect": true,
+  "round_start_effect": false,
+  "sidekick_battle_effect_ids": [
+   13,
+   19
+  ],
+  "single_round_effect": true,
+  "value1": true,
+  "value2": true,
+  "value3": false
+ },
+ "15": {
+  "after_hit_effect": true,
+  "round_start_effect": false,
+  "sidekick_battle_effect_ids": [
+   14
+  ],
+  "single_round_effect": true,
+  "value1": true,
+  "value2": true,
+  "value3": false
+ },
+ "16": {
+  "after_hit_effect": true,
+  "round_start_effect": false,
+  "sidekick_battle_effect_ids": [
+   10,
+   12,
+   28,
+   30,
+   33,
+   40,
+   41,
+   42,
+   53,
+   62,
+   63,
+   79,
+   1008,
+   90,
+   203,
+   207,
+   209,
+   210,
+   217,
+   223,
+   1053,
+   239,
+   246,
+   1064,
+   255,
+   1073
+  ],
+  "single_round_effect": false,
+  "value1": true,
+  "value2": true,
+  "value3": true
+ },
+ "17": {
+  "after_hit_effect": true,
+  "round_start_effect": false,
+  "sidekick_battle_effect_ids": [
+   54
+  ],
+  "single_round_effect": true,
+  "value1": true,
+  "value2": false,
+  "value3": false
+ },
+ "18": {
+  "after_hit_effect": true,
+  "round_start_effect": false,
+  "sidekick_battle_effect_ids": [
+   55,
+   81,
+   97,
+   225,
+   234,
+   251,
+   264
+  ],
+  "single_round_effect": false,
+  "value1": true,
+  "value2": true,
+  "value3": true
+ },
+ "19": {
+  "after_hit_effect": true,
+  "round_start_effect": false,
+  "sidekick_battle_effect_ids": [
+   56,
+   88,
+   232,
+   244,
+   258,
+   260,
+   263,
+   266
+  ],
+  "single_round_effect": true,
+  "value1": true,
+  "value2": true,
+  "value3": false
+ },
+ "2": {
+  "after_hit_effect": false,
+  "round_start_effect": true,
+  "sidekick_battle_effect_ids": [
+   23
+  ],
+  "single_round_effect": true,
+  "value1": true,
+  "value2": false,
+  "value3": false
+ },
+ "20": {
+  "after_hit_effect": true,
+  "round_start_effect": false,
+  "sidekick_battle_effect_ids": [
+   57
+  ],
+  "single_round_effect": true,
+  "value1": true,
+  "value2": false,
+  "value3": false
+ },
+ "21": {
+  "after_hit_effect": true,
+  "round_start_effect": false,
+  "sidekick_battle_effect_ids": [
+   58
+  ],
+  "single_round_effect": true,
+  "value1": true,
+  "value2": true,
+  "value3": false
+ },
+ "22": {
+  "after_hit_effect": true,
+  "round_start_effect": false,
+  "sidekick_battle_effect_ids": [
+   59
+  ],
+  "single_round_effect": false,
+  "value1": true,
+  "value2": true,
+  "value3": true
+ },
+ "23": {
+  "after_hit_effect": true,
+  "round_start_effect": false,
+  "sidekick_battle_effect_ids": [
+   60,
+   64,
+   73,
+   74,
+   75,
+   1005,
+   80,
+   83,
+   91,
+   99,
+   204,
+   205,
+   206,
+   213,
+   215,
+   229,
+   1054,
+   238,
+   253,
+   259
+  ],
+  "single_round_effect": true,
+  "value1": true,
+  "value2": false,
+  "value3": false
+ },
+ "24": {
+  "after_hit_effect": true,
+  "round_start_effect": false,
+  "sidekick_battle_effect_ids": [
+   2001
+  ],
+  "single_round_effect": true,
+  "value1": true,
+  "value2": true,
+  "value3": true
+ },
+ "3": {
+  "after_hit_effect": true,
+  "round_start_effect": false,
+  "sidekick_battle_effect_ids": [
+   2,
+   15,
+   11,
+   17,
+   21,
+   18,
+   27,
+   35,
+   37,
+   38,
+   39,
+   43,
+   44,
+   45,
+   46,
+   50,
+   52,
+   67,
+   71,
+   72,
+   77,
+   85,
+   86,
+   89,
+   92,
+   96,
+   98,
+   1032,
+   211,
+   212,
+   218,
+   219,
+   220,
+   222,
+   226,
+   228,
+   1050,
+   237,
+   241,
+   1060,
+   245,
+   247,
+   249,
+   252,
+   256,
+   261,
+   267
+  ],
+  "single_round_effect": true,
+  "value1": true,
+  "value2": false,
+  "value3": false
+ },
+ "4": {
+  "after_hit_effect": false,
+  "round_start_effect": true,
+  "sidekick_battle_effect_ids": [
+   26,
+   250,
+   257,
+   265
+  ],
+  "single_round_effect": true,
+  "value1": true,
+  "value2": false,
+  "value3": false
+ },
+ "5": {
+  "after_hit_effect": true,
+  "round_start_effect": false,
+  "sidekick_battle_effect_ids": [
+   29,
+   68
+  ],
+  "single_round_effect": true,
+  "value1": true,
+  "value2": false,
+  "value3": false
+ },
+ "6": {
+  "after_hit_effect": true,
+  "round_start_effect": false,
+  "sidekick_battle_effect_ids": [
+   4,
+   24,
+   31,
+   36,
+   47,
+   48,
+   49,
+   66,
+   70,
+   84,
+   93,
+   231,
+   236
+  ],
+  "single_round_effect": true,
+  "value1": true,
+  "value2": false,
+  "value3": false
+ },
+ "7": {
+  "after_hit_effect": true,
+  "round_start_effect": false,
+  "sidekick_battle_effect_ids": [
+   5
+  ],
+  "single_round_effect": true,
+  "value1": true,
+  "value2": false,
+  "value3": false
+ },
+ "8": {
+  "after_hit_effect": true,
+  "round_start_effect": false,
+  "sidekick_battle_effect_ids": [
+   20,
+   243
+  ],
+  "single_round_effect": true,
+  "value1": true,
+  "value2": true,
+  "value3": true
+ },
+ "9": {
+  "after_hit_effect": false,
+  "round_start_effect": true,
+  "sidekick_battle_effect_ids": [
+   6,
+   22,
+   51
+  ],
+  "single_round_effect": true,
+  "value1": true,
+  "value2": false,
+  "value3": false
+ }
+}

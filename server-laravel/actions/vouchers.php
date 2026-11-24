@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+use HeroZero\GameTime;
+
 use HeroZero\Character;
 use HeroZero\Db;
 use HeroZero\GameError;
@@ -15,10 +17,16 @@ return function (array $params): array {
     $userId = (int)($params['user_id'] ?? 0);
     $char = Character::loadByUser($userId);
     $cid = $char->id();
+    if (($params['action'] ?? '') === 'redeemUserVouchers' || str_starts_with((string)($params['code'] ?? ''), 'msg_')) {
+        $reward = \HeroZero\UserVouchers::redeem($cid, \HeroZero\UserVouchers::parseCodes($params));
+        $data = Live::accountState($userId);
+        $data['voucher_rewards'] = (object)$reward;
+        return $data;
+    }
     $codes = preg_split('/[;,\s]+/', (string)($params['code'] ?? $params['codes'] ?? ''), -1, PREG_SPLIT_NO_EMPTY) ?: [];
 
     $totalRewards = [];
-    $now = time();
+    $now = GameTime::now();
     foreach ($codes as $code) {
         $voucher = Db::row('SELECT * FROM `vouchers` WHERE code = ? AND status = 1', [$code]);
         if ($voucher === null) {

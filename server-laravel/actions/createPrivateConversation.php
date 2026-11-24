@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+use HeroZero\GameTime;
+
 use HeroZero\Character;
 use HeroZero\Db;
 use HeroZero\Live;
@@ -13,7 +15,7 @@ return function (array $params): array {
         Db::exec(
             "INSERT INTO `messages` (character_from_id, character_to_ids, subject, message, flag, flag_value, ts_creation, readed)
              VALUES (?, ?, '', ?, '', '', ?, 0)",
-            [$char->id(), $to, $message, time()]
+            [$char->id(), $to, $message, GameTime::now()]
         );
     }
     $data = Live::template('createPrivateConversation');

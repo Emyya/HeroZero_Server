@@ -316,7 +316,12 @@ indisponível. Push é uma melhoria de latência, não bloqueador funcional.
 apareceram em `tools/capture/` nem no HAR** — são a lista de risco: features que o client suporta
 mas que no nosso `Router.php` provavelmente caem em `stateEcho.php` (passthrough genérico) sem
 nunca terem sido testadas contra o shape real (ex.: `private_conversation*`, `league_opponents`,
-`missed_league_fight*`, `sidekick*`, `guild_battle_*`/`guild_history_battle*`, `worldboss_*`,
+`missed_league_fight*`, `sidekick*`, `guild_battle_*`/`guild_history_battle*` (histórico de lutas
+da team — histórico validado em 2026-08: `getGuildBattleHistoryFights` → `guild_history_battles`
+[DOGuildHistoryBattle: type/id/battle_timestamp/enemy/joined_character_ids/rewards JSON c/ honor/
+won bool/enemy_name/emblema ebs..eiz]; `getGuildBattleHistoryFight` type=3 → DOGuildDungeonBattle,
+1|2 → DOGuildBattle + guilda inimiga em `guild_battle_guilds` — ver actions/guildState.php),
+`worldboss_*`,
 `legendary_dungeon_run`, `season_rewards`, `speedserver_*`, `surveys`, `voucher_rewards`).
 
 ## Próximos passos de RE

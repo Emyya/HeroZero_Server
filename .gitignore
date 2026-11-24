@@ -1,5 +1,34 @@
 .claude/
 
+# Assets oficiais do jogo (não publicar)
+/assets/
+/server-laravel/public/assets/
+
+# Dados/montagens Docker e BD
+/containers/
+/docker/
+
+# Estado de execução local
+/.run/
+/.logs/
+__pycache__/
+*.pyc
+*.log
+
+# Bots (não publicar)
+/bots/
+/bot.py
+
+# Backups com dados de jogadores
+/server-laravel/storage/database-backups/
+/server-laravel/storage/backups/
+/server-laravel/storage/season-debug-backups/
+
+# Segredos
+.env
+*.pem
+*.key
+
 # Binarios de terceiros (runtimes/ferramentas)
 tools/php83/
 tools/ILSpy/
@@ -9,3 +38,4 @@ tools/__pycache__/
 # Capturas HAR/logs (podem conter cookies/tokens de sessao)
 tools/capture/
 tools/reverse/
+*.har

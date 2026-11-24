@@ -1,5 +1,8 @@
 # Design do nosso servidor (cliente HTML5, build 257)
 
+Execução local atual: [stack Docker](DOCKER.md) para jogo/admin/MySQL/socket;
+bots em Python local. `start.sh` e `stop.sh` usam o Compose da raiz.
+
 Objetivo: servidor próprio para o **cliente HTML5 atualizado** (`HeroZero.min.js`),
 usando o **HeroZServer (Owryn/xReveres)** como referência de arquitetura/lógica e a
 **captura HAR** (`tools/capture/`) como verdade do formato exato das respostas.

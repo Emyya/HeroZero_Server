@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+use HeroZero\GameTime;
+
 use HeroZero\Character;
 use HeroZero\Db;
 use HeroZero\GameError;
@@ -41,7 +43,7 @@ return function (array $params): array {
         Db::exec(
             'INSERT INTO `guild_logs` (guild_id, character_id, character_name, type, value1, value2, value3, timestamp)
              VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-            [$guildId, $char->id(), $char->name(), $type, mb_substr($v1, 0, 64), mb_substr($v2, 0, 64), mb_substr($v3, 0, 64), time()]
+            [$guildId, $char->id(), $char->name(), $type, mb_substr($v1, 0, 64), mb_substr($v2, 0, 64), mb_substr($v3, 0, 64), GameTime::now()]
         );
     };
 

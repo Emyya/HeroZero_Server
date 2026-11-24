@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+use HeroZero\GameTime;
+
 use HeroZero\Character;
 use HeroZero\Db;
 use HeroZero\GameError;
@@ -12,7 +14,7 @@ return function (array $params): array {
     $premiumCost = max(1, (int)ceil($duration / 21600));
 
     $char = Character::loadByUser($userId);
-    $baseExpires = max(time(), (int)Db::value(
+    $baseExpires = max(GameTime::now(), (int)Db::value(
         'SELECT ts_active_sense_boost_expires FROM `character` WHERE id = ?',
         [$char->id()]
     ));
@@ -35,7 +37,7 @@ return function (array $params): array {
             'UPDATE `character`
                 SET ts_active_sense_boost_expires = ?, ts_last_action = ?
               WHERE id = ?',
-            [$expires, time(), $char->id()]
+            [$expires, GameTime::now(), $char->id()]
         );
         Db::pdo()->commit();
     } catch (GameError $e) {

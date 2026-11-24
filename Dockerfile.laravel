@@ -1,0 +1,26 @@
+FROM php:8.3-cli
+
+RUN apt-get update && apt-get install -y \
+    curl unzip git libzip-dev libonig-dev libxml2-dev libicu-dev gettext libcurl4-openssl-dev \
+    && docker-php-ext-install \
+        bcmath curl mbstring mysqli pdo_mysql zip xml intl \
+    && apt-get clean
+
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+WORKDIR /app
+
+COPY . .
+
+RUN composer install --no-interaction --prefer-dist
+
+RUN cp .env.example .env && \
+    sed -i 's/^DB_CONNECTION=.*/DB_CONNECTION=mysql/' .env && \
+    sed -i 's/^.*DB_HOST=.*/DB_HOST=db/' .env && \
+    sed -i 's/^.*DB_PORT=.*/DB_PORT=3306/' .env && \
+    sed -i 's/^.*DB_DATABASE=.*/DB_DATABASE=herozero/' .env && \
+    sed -i 's/^.*DB_USERNAME=.*/DB_USERNAME=root/' .env && \
+    sed -i 's/^.*DB_PASSWORD=.*/DB_PASSWORD=root/' .env && \
+    php artisan key:generate
+
+EXPOSE 8000
